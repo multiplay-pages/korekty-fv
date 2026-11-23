@@ -1,0 +1,51 @@
+{
+  "checkedOn": "2026-11-13",
+  "sources": [
+    {
+      "id": "414daa43f56881a596bde082d1f11e9a",
+      "url": "https://app.notion.com/p/414daa43f56881a596bde082d1f11e9a?pvs=204",
+      "lastEdited": "2026-11-12T09:59:54.517Z",
+      "verification": {
+        "state": "unverified"
+      }
+    },
+    {
+      "id": "414daa43f5688104a8acc587a0d8df7e",
+      "url": "https://app.notion.com/p/414daa43f5688104a8acc587a0d8df7e?pvs=204",
+      "lastEdited": "2026-11-12T22:45:27.200Z",
+      "verification": {
+        "state": "unverified"
+      }
+    },
+    {
+      "id": "414daa43f568817784f8e58ecad50f9c",
+      "url": "https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c?pvs=204",
+      "lastEdited": "2026-11-12T09:58:43.567Z",
+      "verification": {
+        "state": "unverified"
+      }
+    },
+    {
+      "id": "414daa43f56881fb972acdf7511d52fa",
+      "url": "https://app.notion.com/p/414daa43f56881fb972acdf7511d52fa?pvs=204",
+      "lastEdited": "2026-11-12T09:56:11.883Z",
+      "verification": {
+        "state": "unverified"
+      }
+    },
+    {
+      "id": "414daa43f568818f97e4fa91a12935e1",
+      "url": "https://app.notion.com/p/414daa43f568818f97e4fa91a12935e1?pvs=204",
+      "lastEdited": "2026-11-12T09:57:19.809Z",
+      "verification": {
+        "state": "unverified"
+      }
+    }
+  ],
+  "decisions": {
+    "D23": "Ustalone roboczo — globalny wybór metody",
+    "D11": "Otwarte — VAT, księgowanie, grosze"
+  },
+  "testRegisterCount": 27,
+  "scope": "Wyłącznie lokalny etap2; nie aktualizuje Notion."
+}

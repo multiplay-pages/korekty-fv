@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>Kalkulator korekt 1/30 · Multiplay BOK</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.mjs"></script>
+</head>
+<body>
+<a class="skip-link" href="#calculator-form">Przejdź do formularza</a>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="/" aria-label="Multiplay BOK — początek"><span class="brand-mark" aria-hidden="true">m</span><span>multiplay<span class="brand-divider">/</span><strong>BOK</strong></span></a><span class="environment">Środowisko lokalne <span aria-hidden="true">·</span> Etap 2</span></div></header>
+<main>
+  <div class="page-heading"><div><p class="eyebrow">NARZĘDZIA ROZLICZENIOWE</p><h1>Kalkulator korekt <span>1/30</span></h1><p class="intro">Oblicz stary i nowy abonament cząstkowy oraz zmianę kwoty na fakturze.</p></div><span class="badge">Wersja testowa</span></div>
+  <div class="scope-note"><strong>Prototyp do testów.</strong> Wprowadzaj wyłącznie dane syntetyczne. Podstawa umowna, VAT, księgowanie i zaokrąglenia wymagają zatwierdzenia.</div>
+  <form id="calculator-form" novalidate autocomplete="off">
+    <div id="errors" class="error-box" role="alert" tabindex="-1" hidden></div>
+    <section class="sheet" aria-labelledby="event-heading">
+      <div class="section-heading"><h2 id="event-heading"><span class="step">01</span> Zdarzenie i okres</h2><span class="section-hint">Jedna wspólna data dla całego koszyka</span></div>
+      <div class="event-grid">
+        <div class="field"><label for="event-type">Co zmieniasz?</label><select id="event-type"><option value="DOWNGRADE">Przedłużenie — obniżenie abonamentu</option><option value="WYPOWIEDZENIE">Zakończenie usługi</option><option value="PODWYŻKA">Przedłużenie — zwiększenie abonamentu</option><option value="NO_CHANGE">Brak zmiany łącznej ceny / kontrola</option></select></div>
+        <div class="field"><label for="month">Miesiąc rozliczeniowy</label><input id="month" type="month" required min="0001-01" max="9999-12"><small id="month-preview"></small></div>
+        <div class="field" id="end-date-field" hidden><label for="last-old-date">Ostatni dzień usługi</label><input id="last-old-date" type="date" min="0001-01-01" max="9999-12-31"><small>Ostatni płatny dzień. Dzień bez usługi musi być następny. <span id="end-date-preview"></span></small></div>
+        <div class="field"><label for="effective-date" id="effective-label">Od kiedy obowiązuje nowy abonament?</label><input id="effective-date" type="date" required min="0001-01-01" max="9999-12-31"><small><span id="date-hint">Nowe warunki obowiązują od tego dnia włącznie.</span> <span id="date-preview"></span></small></div>
+      </div>
+      <p class="date-note">Wpisz uzgodnioną datę zmiany lub zakończenia usługi. Kalkulator wylicza kwoty na jej podstawie.</p>
+    </section>
+    <section class="sheet" aria-labelledby="positions-heading">
+      <div class="section-heading"><h2 id="positions-heading"><span class="step">02</span> Ceny abonamentu</h2><span class="section-hint">Pełne ceny miesięczne brutto po rabatach · zł/mies.</span></div>
+      <p class="section-copy">Wpisz pełne abonamenty miesięczne już po rabatach — części za stary i nowy okres wyliczy kalkulator. Kwotę faktury przyjmujemy jak dotychczasowy abonament; zaznacz „inna kwota”, jeśli faktyczne naliczenie jest inne. Uwzględniaj tylko opłaty cykliczne.</p>
+      <div id="termination-note" class="inline-note" hidden>Kończysz cały analizowany zakres — nowy abonament każdej pozycji wynosi 0,00 zł.</div>
+      <table id="positions" class="entry-table simplified"><caption class="sr-only">Pełne miesięczne ceny abonamentu i kwoty już naliczone na fakturze</caption><thead><tr><th scope="col">Usługa</th><th scope="col">Dotychczasowy abonament<span class="subhead">pełny miesiąc</span></th><th scope="col">Nowy abonament<span class="subhead">pełny miesiąc</span></th><th scope="col">Już naliczono na fakturze</th><th scope="col">Szczegóły</th><th scope="col"><span class="sr-only">Usuń pozycję</span></th></tr></thead><tbody></tbody><tfoot><tr><th scope="row">Razem</th><td id="total-old">—</td><td id="total-new">—</td><td id="total-invoiced">—</td><td colspan="2">Kwoty brutto</td></tr></tfoot></table>
+      <div class="table-actions"><button id="add-position" class="button secondary" type="button"><span aria-hidden="true">＋</span> Dodaj pozycję</button><span id="row-count" class="muted">1 pozycja</span></div>
+      <details class="complexity"><summary>Przypadek złożony — sprawdź przed obliczeniem</summary><div class="complexity-options"><label class="check-line"><input id="multiple-dates" type="checkbox"><span>W koszyku jest więcej niż jedna niezależna data zmiany.</span></label><label class="check-line"><input id="unresolved-discounts" type="checkbox"><span>Występują nieuzgodnione rabaty lub znaki pozycji rabatowych.</span></label><p>Takie przypadki oraz różne kategorie VAT wymagają odrębnej kontroli. Prototyp blokuje ich łączne rozliczenie.</p></div></details>
+    </section>
+    <div class="action-bar"><button id="calculate" class="button primary" type="submit">Oblicz korektę <span aria-hidden="true">→</span></button><button id="reset" class="button quiet" type="button">Resetuj wszystko</button><div class="example-actions"><label for="example-select" class="sr-only">Przykład do sprawdzenia</label><select id="example-select"><option value="">Wybierz przykład</option><option value="FEB_CHANGE">Luty: 100 → 80 zł od 4 lutego</option><option value="T26">Internet i telewizja — zmiana pakietu</option><option value="T27">Zmiana usług przy tej samej cenie łącznej</option><option value="T08">Zakończenie po 1 dniu usługi</option><option value="T01">Obniżka w lutym — 28 dni</option><option value="T02">Obniżka w lutym przestępnym — 29 dni</option><option value="T03">Obniżka w listopadzie — 30 dni</option><option value="T18">Podwyżka od początku miesiąca</option></select><button id="load-example" class="button secondary" type="button" disabled>Wczytaj przykład</button></div></div>
+    <p id="form-feedback" class="feedback" role="status">Zacznij od danych lub wczytaj przykład testowy.</p>
+  </form>
+  <section id="results" class="results" aria-labelledby="result-heading" hidden>
+    <div class="result-heading"><h2 id="result-heading" tabindex="-1"><span class="step">03</span> Jak przygotować korektę</h2><div class="result-actions"><span class="badge">Kwoty robocze</span><button id="reset-result" class="button secondary" type="button">Nowe obliczenie — resetuj wszystko</button></div></div>
+    <div id="invoice-plan" class="invoice-plan" hidden>
+      <p id="invoice-plan-status" class="message info"></p>
+      <table class="invoice-table"><caption class="sr-only">Stary abonament po korekcie i nowa część do dodania</caption><thead><tr><th scope="col">Usługa</th><th scope="col">Stary abonament<br>po korekcie</th><th scope="col">Nowy abonament<br>do dodania</th><th scope="col">Razem części</th><th scope="col">Reszta do uzgodnienia</th></tr></thead><tbody></tbody></table>
+      <div class="invoice-total"><span>Razem stary i nowy abonament</span><strong id="invoice-parts-total"></strong></div>
+      <p id="invoice-model-note" class="model-note"></p>
+      <details class="invoice-rounding"><summary>Kontrola zgodności kwot i zaokrągleń</summary><p id="invoice-plan-control"></p></details>
+    </div>
+    <div class="result-main"><div class="amount-main"><p>Należność za miesiąc</p><strong id="due">—</strong><span id="result-period"></span></div><div class="amount-delta"><p>Zmniejszenie (+) / zwiększenie (−) faktury</p><strong id="delta">—</strong><span id="delta-explanation"></span></div><div class="method-main"><p>Sposób naliczenia</p><strong id="global-method">—</strong><span id="method-explanation"></span></div></div>
+    <div class="nominal-row"><span>Nowy abonament za pełny miesiąc</span><strong id="nominal-price"></strong><span>Różnica faktury nie jest kwotą zwrotu z wpłat.</span></div>
+    <details class="method-details"><summary>Skąd te kwoty? Obliczenia krok po kroku</summary><div class="method-body"><dl class="days"><div><dt>Dni miesiąca</dt><dd id="days-month"></dd></div><div><dt>Dni przed zmianą</dt><dd id="days-old"></dd></div><div><dt>Dni od zmiany</dt><dd id="days-new"></dd></div></dl><div id="calculation-steps"></div><p id="formula-note" class="muted"></p></div></details>
+    <details class="technical-rows"><summary>Szczegółowa kontrola pozycji koszyka</summary>
+    <div class="proposal-heading"><h3>Kontrola należności usług</h3><p class="accounting-status">PROPOZYCJA TESTOWA — wymaga weryfikacji księgowej</p><p>Reszty groszowe pokazujemy jawnie, bez automatycznego przydzielania do wybranej usługi.</p></div>
+    <table id="line-results" class="result-table"><caption class="sr-only">Robocze należności i różnice pozycji</caption><thead><tr><th scope="col">Pozycja</th><th scope="col">Sposób naliczenia</th><th scope="col">Naliczono na fakturze</th><th scope="col">Należność — testowa</th><th scope="col">Zmniejszenie (+) / zwiększenie (−)</th></tr></thead><tbody></tbody></table>
+    <div class="reconciliation"><div><span>Suma propozycji pozycji</span><strong id="row-sum"></strong></div><div><span>Reszta nieprzypisana <span class="muted">(koszyk − suma pozycji)</span></span><strong id="rounding-residual"></strong></div><p id="reconciliation-status"></p></div>
+    </details>
+    <div id="messages" class="messages" aria-label="Ostrzeżenia i kontrole"></div>
+  </section>
+  <section class="summary-section" aria-labelledby="summary-heading"><div class="section-heading"><div><h2 id="summary-heading">Podsumowanie korekty do skopiowania</h2><p class="section-copy">Kwoty starego i nowego abonamentu, daty i kontrole. Bez danych klienta.</p></div><button id="copy-summary" class="button secondary" type="button" disabled>Kopiuj robocze podsumowanie</button></div><label class="sr-only" for="summary">Treść roboczego podsumowania</label><textarea id="summary" rows="6" readonly placeholder="Podsumowanie pojawi się po poprawnym obliczeniu."></textarea><p id="copy-feedback" role="status" class="feedback"></p></section>
+  <footer><span>Reguła 0.2.0 · Części miesiąca: rzeczywiste dni ÷ 30 · 13.11.2026</span><span>Wersja testowa · Wymaga akceptacji przed użyciem produkcyjnym</span></footer>
+</main>
+<noscript>Włącz JavaScript, aby obliczać korekty lokalnie w przeglądarce.</noscript>
+</body>
+</html>

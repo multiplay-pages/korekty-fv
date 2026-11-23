@@ -1,0 +1,167 @@
+{
+  "retrievedOn": "2026-11-12",
+  "cases": [
+    {
+      "id": "T01",
+      "url": "https://app.notion.com/p/414daa43f5688182bff2fc0acb77998e",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2027-02; pierwszy dzień nowych zasad T: 2027-02-18\n- O=150 zł; N=100 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=28; dni starych zasad d=17; dni nowych zasad r=11.\n\n## Wyniki kontrolne\n\n- A = 128.33 zł.\n- B = 131.67 zł.\n- Metoda/polityka: <b>A</b>.\n- Należność: <b>128.33 zł</b>.\n- Różnica zafakturowana F minus należność: <b>21.67 zł</b>.\n\n## Uwaga\n\nStandard luty nieprzestępny.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T02",
+      "url": "https://app.notion.com/p/414daa43f568810eac24d7b0e0da1cd0",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2028-02; pierwszy dzień nowych zasad T: 2028-02-18\n- O=150 zł; N=100 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=29; dni starych zasad d=17; dni nowych zasad r=12.\n\n## Wyniki kontrolne\n\n- A = 128.33 zł.\n- B = 130.00 zł.\n- Metoda/polityka: <b>A</b>.\n- Należność: <b>128.33 zł</b>.\n- Różnica zafakturowana F minus należność: <b>21.67 zł</b>.\n\n## Uwaga\n\nLuty przestępny.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T03",
+      "url": "https://app.notion.com/p/414daa43f568819589e2f40a32476695",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2026-11; pierwszy dzień nowych zasad T: 2026-11-18\n- O=150 zł; N=100 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=30; dni starych zasad d=17; dni nowych zasad r=13.\n\n## Wyniki kontrolne\n\n- A = 128.33 zł.\n- B = 128.33 zł.\n- Metoda/polityka: <b>A=B</b>.\n- Należność: <b>128.33 zł</b>.\n- Różnica zafakturowana F minus należność: <b>21.67 zł</b>.\n\n## Uwaga\n\nRówność metod.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T04",
+      "url": "https://app.notion.com/p/414daa43f568818f83badac44f59e30d",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2027-03; pierwszy dzień nowych zasad T: 2027-03-18\n- O=150 zł; N=100 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=31; dni starych zasad d=17; dni nowych zasad r=14.\n\n## Wyniki kontrolne\n\n- A = 128.33 zł.\n- B = 126.67 zł.\n- Metoda/polityka: <b>B</b>.\n- Należność: <b>126.67 zł</b>.\n- Różnica zafakturowana F minus należność: <b>23.33 zł</b>.\n\n## Uwaga\n\nWariant B niższy.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T05",
+      "url": "https://app.notion.com/p/414daa43f5688156a057f8a77254dbab",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: WYPOWIEDZENIE\n- Miesiąc: 2026-11; pierwszy dzień nowych zasad T: 2026-11-18\n- O=150 zł; N=0 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=30; dni starych zasad d=17; dni nowych zasad r=13.\n\n## Wyniki kontrolne\n\n- A = 85.00 zł.\n- B = 85.00 zł.\n- Metoda/polityka: <b>A=B</b>.\n- Należność: <b>85.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>65.00 zł</b>.\n\n## Uwaga\n\nT jest dniem po ostatnim dniu usługi.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T06",
+      "url": "https://app.notion.com/p/414daa43f56881a8995eda3594b15ba9",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: WYPOWIEDZENIE\n- Miesiąc: 2027-02; pierwszy dzień nowych zasad T: 2027-02-18\n- O=150 zł; N=0 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=28; dni starych zasad d=17; dni nowych zasad r=11.\n\n## Wyniki kontrolne\n\n- A = 85.00 zł.\n- B = 95.00 zł.\n- Metoda/polityka: <b>A</b>.\n- Należność: <b>85.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>65.00 zł</b>.\n\n## Uwaga\n\n28 dni.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T07",
+      "url": "https://app.notion.com/p/414daa43f56881789e16f1846e2440aa",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: WYPOWIEDZENIE\n- Miesiąc: 2027-03; pierwszy dzień nowych zasad T: 2027-03-18\n- O=150 zł; N=0 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=31; dni starych zasad d=17; dni nowych zasad r=14.\n\n## Wyniki kontrolne\n\n- A = 85.00 zł.\n- B = 80.00 zł.\n- Metoda/polityka: <b>B</b>.\n- Należność: <b>80.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>70.00 zł</b>.\n\n## Uwaga\n\n31 dni.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T08",
+      "url": "https://app.notion.com/p/414daa43f56881298c77de61efbe2f47",
+      "lastEdited": "2026-11-10T22:52:06.652Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: WYPOWIEDZENIE\n- Miesiąc: 2027-03; pierwszy dzień nowych zasad T: 2027-03-02\n- O=150 zł; N=0 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=31; dni starych zasad d=1; dni nowych zasad r=30.\n\n## Wyniki kontrolne\n\n- A = 5.00 zł.\n- B = 0.00 zł.\n- Metoda/polityka: <b>B</b>.\n- Należność: <b>0.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>150.00 zł</b>.\n\n## Uwaga\n\nWynik 0 zł za 1 dzień jest biznesowo zaakceptowany 10.11.2026. Należy wyświetlić objaśnienie metody B bez automatycznej blokady kalkulacji; weryfikacja umowna i VAT pozostaje odrębna.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T09",
+      "url": "https://app.notion.com/p/414daa43f56881a8ac54f0d0b1d3ed46",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2027-03; pierwszy dzień nowych zasad T: 2027-03-01\n- O=150 zł; N=100 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=31; dni starych zasad d=0; dni nowych zasad r=31.\n\n## Wyniki kontrolne\n\n- A = 100.00 zł.\n- B = 98.33 zł.\n- Metoda/polityka: <b>Pełna N</b>.\n- Należność: <b>100.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>50.00 zł</b>.\n\n## Uwaga\n\nNie wybierać B w 31-dniowym miesiącu.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T10",
+      "url": "https://app.notion.com/p/414daa43f568819bbbb5fdae627e350d",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2027-03; pierwszy dzień nowych zasad T: 2027-03-02\n- O=150 zł; N=100 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=31; dni starych zasad d=1; dni nowych zasad r=30.\n\n## Wyniki kontrolne\n\n- A = 101.67 zł.\n- B = 100.00 zł.\n- Metoda/polityka: <b>B</b>.\n- Należność: <b>100.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>50.00 zł</b>.\n\n## Uwaga\n\nNależność może być równa N mimo 1 dnia starej ceny.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T11",
+      "url": "https://app.notion.com/p/414daa43f5688179beaec9c3a017393f",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2027-03; pierwszy dzień nowych zasad T: 2027-03-31\n- O=150 zł; N=100 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=31; dni starych zasad d=30; dni nowych zasad r=1.\n\n## Wyniki kontrolne\n\n- A = 150.00 zł.\n- B = 148.33 zł.\n- Metoda/polityka: <b>B</b>.\n- Należność: <b>148.33 zł</b>.\n- Różnica zafakturowana F minus należność: <b>1.67 zł</b>.\n\n## Uwaga\n\nOstatni dzień miesiąca nową ceną.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T12",
+      "url": "https://app.notion.com/p/414daa43f56881109158facf1198e79b",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2027-02; pierwszy dzień nowych zasad T: 2027-02-28\n- O=150 zł; N=100 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=28; dni starych zasad d=27; dni nowych zasad r=1.\n\n## Wyniki kontrolne\n\n- A = 145.00 zł.\n- B = 148.33 zł.\n- Metoda/polityka: <b>A</b>.\n- Należność: <b>145.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>5.00 zł</b>.\n\n## Uwaga\n\nRabat większy niż sama 1/30 różnicy za jeden dzień.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T13",
+      "url": "https://app.notion.com/p/414daa43f5688187857fd46f20edca33",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2026-11; pierwszy dzień nowych zasad T: 2026-12-01\n- O=150 zł; N=100 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=30; dni starych zasad d=30; dni nowych zasad r=0.\n\n## Wyniki kontrolne\n\n- A = 150.00 zł.\n- B = 150.00 zł.\n- Metoda/polityka: <b>Pełna O</b>.\n- Należność: <b>150.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>0.00 zł</b>.\n\n## Uwaga\n\nZero korekty w obecnym okresie.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T14",
+      "url": "https://app.notion.com/p/414daa43f56881089dd2da7ac2c4b070",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2026-12; pierwszy dzień nowych zasad T: 2026-11-18\n- O=150 zł; N=100 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=31; dni starych zasad d=0; dni nowych zasad r=31.\n\n## Wyniki kontrolne\n\n- A = 100.00 zł.\n- B = 98.33 zł.\n- Metoda/polityka: <b>Pełna N</b>.\n- Należność: <b>100.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>50.00 zł</b>.\n\n## Uwaga\n\nW całym bieżącym miesiącu nowa stawka.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T15",
+      "url": "https://app.notion.com/p/414daa43f56881dfa660e45423eda2a8",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: PODWYŻKA\n- Miesiąc: 2026-11; pierwszy dzień nowych zasad T: 2026-11-18\n- O=150 zł; N=180 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=30; dni starych zasad d=17; dni nowych zasad r=13.\n\n## Wyniki kontrolne\n\n- A = 163.00 zł.\n- B = 163.00 zł.\n- Metoda/polityka: <b>Pełna O</b>.\n- Należność: <b>150.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>0.00 zł</b>.\n\n## Uwaga\n\nBrak dopłaty w miesiącu zmiany.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T16",
+      "url": "https://app.notion.com/p/414daa43f568813bad94df34a6b68484",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: PODWYŻKA\n- Miesiąc: 2027-02; pierwszy dzień nowych zasad T: 2027-02-18\n- O=150 zł; N=180 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=28; dni starych zasad d=17; dni nowych zasad r=11.\n\n## Wyniki kontrolne\n\n- A = 163.00 zł.\n- B = 161.00 zł.\n- Metoda/polityka: <b>Pełna O</b>.\n- Należność: <b>150.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>0.00 zł</b>.\n\n## Uwaga\n\nLuty bez dopłaty.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T17",
+      "url": "https://app.notion.com/p/414daa43f56881f8aea9e7377d5bbe65",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: PODWYŻKA\n- Miesiąc: 2027-03; pierwszy dzień nowych zasad T: 2027-03-18\n- O=150 zł; N=180 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=31; dni starych zasad d=17; dni nowych zasad r=14.\n\n## Wyniki kontrolne\n\n- A = 163.00 zł.\n- B = 164.00 zł.\n- Metoda/polityka: <b>Pełna O</b>.\n- Należność: <b>150.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>0.00 zł</b>.\n\n## Uwaga\n\nMarzec bez dopłaty.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T18",
+      "url": "https://app.notion.com/p/414daa43f56881fc8823fdb90ed9ab66",
+      "lastEdited": "2026-11-10T22:52:04.944Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: PODWYŻKA\n- Miesiąc: 2027-03; pierwszy dzień nowych zasad T: 2027-03-01\n- O=150 zł; N=180 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=31; dni starych zasad d=0; dni nowych zasad r=31.\n\n## Wyniki kontrolne\n\n- A = 180.00 zł.\n- B = 181.00 zł.\n- Metoda/polityka: <b>Pełna N</b> (podwyżka od 1. dnia miesiąca).\n- Należność: <b>180.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>-30.00 zł</b>. Jest to potencjalna dodatkowa należność 30 zł do zweryfikowania w systemie fakturowym, a nie korekta zmniejszająca.\n\n## Uwaga\n\nReguła podwyżki od 1. dnia została potwierdzona biznesowo 10.11.2026. Nadal wymaga kontroli prawidłowości pierwotnego dokumentu i sposobu ewentualnego zwiększenia naliczenia.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T19",
+      "url": "https://app.notion.com/p/414daa43f568812eb39af089de448d46",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: PODWYŻKA\n- Miesiąc: 2026-12; pierwszy dzień nowych zasad T: 2026-11-18\n- O=150 zł; N=180 zł; F=180 zł; wpłata P=180 zł.\n- Długość miesiąca L=31; dni starych zasad d=0; dni nowych zasad r=31.\n\n## Wyniki kontrolne\n\n- A = 180.00 zł.\n- B = 181.00 zł.\n- Metoda/polityka: <b>Pełna N</b>.\n- Należność: <b>180.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>0.00 zł</b>.\n\n## Uwaga\n\nNowy pełny miesiąc – wyższy abonament.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T20",
+      "url": "https://app.notion.com/p/414daa43f568812ba248d13d1c860ebf",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2027-02; pierwszy dzień nowych zasad T: 2027-02-18\n- O=150 zł; N=150 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=28; dni starych zasad d=17; dni nowych zasad r=11.\n\n## Wyniki kontrolne\n\n- A = 150.00 zł.\n- B = 150.00 zł.\n- Metoda/polityka: <b>Pełna O</b>.\n- Należność: <b>150.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>0.00 zł</b>.\n\n## Uwaga\n\nN=O: błąd kwalifikacji jako downgrade.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T21",
+      "url": "https://app.notion.com/p/414daa43f56881d69ae9ea0d5e00ad02",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2026-11; pierwszy dzień nowych zasad T: 2026-11-18\n- O=150 zł; N=100 zł; F=150 zł; wpłata P=0 zł.\n- Długość miesiąca L=30; dni starych zasad d=17; dni nowych zasad r=13.\n\n## Wyniki kontrolne\n\n- A = 128.33 zł.\n- B = 128.33 zł.\n- Metoda/polityka: <b>A=B</b>.\n- Należność: <b>128.33 zł</b>.\n- Różnica zafakturowana F minus należność: <b>21.67 zł</b>.\n\n## Uwaga\n\nKorekta faktury nie zależy od wpłaty.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T22",
+      "url": "https://app.notion.com/p/414daa43f56881ac9f25dc2310cd6a93",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: PODWYŻKA\n- Miesiąc: 2026-11; pierwszy dzień nowych zasad T: 2026-11-18\n- O=145 zł; N=150 zł; F=145 zł; wpłata P=145 zł.\n- Długość miesiąca L=30; dni starych zasad d=17; dni nowych zasad r=13.\n\n## Wyniki kontrolne\n\n- A = 147.17 zł.\n- B = 147.17 zł.\n- Metoda/polityka: <b>Pełna O</b>.\n- Należność: <b>145.00 zł</b>.\n- Różnica zafakturowana F minus należność: <b>0.00 zł</b>.\n\n## Uwaga\n\nKierunek klasyfikować po całości koszyka.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T23",
+      "url": "https://app.notion.com/p/414daa43f56881b58347c70127516f81",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2026-11; pierwszy dzień nowych zasad T: 2026-11-18\n- O=150 zł; N=100 zł; F=130 zł; wpłata P=0 zł.\n- Długość miesiąca L=30; dni starych zasad d=17; dni nowych zasad r=13.\n\n## Wyniki kontrolne\n\n- A = 128.33 zł.\n- B = 128.33 zł.\n- Metoda/polityka: <b>A=B</b>.\n- Należność: <b>128.33 zł</b>.\n- Różnica zafakturowana F minus należność: <b>1.67 zł</b>.\n\n## Uwaga\n\nKorekta dokumentu =130 minus należność 128,33.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T24",
+      "url": "https://app.notion.com/p/414daa43f56881d1bf49d8faa49ebc5d",
+      "lastEdited": "2026-11-10T19:10:07.346Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: DOWNGRADE\n- Miesiąc: 2028-02; pierwszy dzień nowych zasad T: 2028-02-29\n- O=150 zł; N=100 zł; F=150 zł; wpłata P=150 zł.\n- Długość miesiąca L=29; dni starych zasad d=28; dni nowych zasad r=1.\n\n## Wyniki kontrolne\n\n- A = 146.67 zł.\n- B = 148.33 zł.\n- Metoda/polityka: <b>A</b>.\n- Należność: <b>146.67 zł</b>.\n- Różnica zafakturowana F minus należność: <b>3.33 zł</b>.\n\n## Uwaga\n\nTest poprawności daty i 29 dni w miesiącu.\n\n## Kryterium akceptacji\n\nWynik aplikacji musi być identyczny po zaokrągleniu do 0,01 zł, a przy przypadku granicznym powinien pojawić się odpowiedni komunikat. Test jest <b>referencyjny na etapie projektowania</b>, nie dowodzi prawnej akceptacji reguły.\n\nŹródło logiki: <mention url=\"https://app.notion.com/p/414daa43f568817784f8e58ecad50f9c\">02 — Algorytm A/B: macierz 1/30, przykłady, testy</mention>.\n"
+    },
+    {
+      "id": "T25",
+      "url": "https://app.notion.com/p/414daa43f56881e5b64fc73666a2fda5",
+      "lastEdited": "2026-11-10T22:53:12.932Z",
+      "body": "\n## Wejście testowe\n\n- Scenariusz: PODWYŻKA\n- Miesiąc 2026-12; pierwszy dzień nowej ceny T=2026-12-01.\n- O=150,00 zł; N=180,00 zł; F=180,00 zł.\n- L=31, d=0, r=31.\n\n## Wynik referencyjny\n\n- Należność: <b>180,00 zł — pełna N</b>, niezależnie od teoretycznego A/B.\n- Korekta zmniejszająca: <b>0,00 zł</b>.\n- Zasada potwierdzona przez kierownika BOK 10.11.2026.\n- Kontrast: przy T=18.11, O=150, N=180, należność w listopadzie pozostaje 150 zł.\n\n## Kryterium odbioru\n\nAplikacja musi rozpoznawać granicę pierwszego dnia kalendarzowego, odróżniać ją od dowolnej podwyżki w środku miesiąca i wskazywać właściwą cenę nowego pełnego okresu.\n"
+    },
+    {
+      "id": "T26",
+      "url": "https://app.notion.com/p/416daa43f56881309e82c172a453944b",
+      "lastEdited": "2026-11-12T09:59:29.435Z",
+      "body": "\n## Parametry wejściowe\n\n- Miesiąc: marzec 2027 (31 dni); T=18.03.2027; d=17; r=14.\n- Internet: O₁=100,00 zł, N₁=60,00 zł, F₁=100,00 zł.\n- TV: O₂=50,00 zł, N₂=70,00 zł, F₂=50,00 zł.\n- Koszyk O=150 zł; N=130 zł; F=150 zł.\n\n## Oczekiwane obliczenia całego pakietu\n\n- A = 130 + 20×17/30 = 141,333333… zł.\n- B = 150 − 20×14/30 = 140,666666… zł.\n- <b>MIN na koszyku = B; należność 140,67 zł; korekta 9,33 zł.</b>\n\n## Oczekiwane przygotowanie pozycji do MMS\n\n- Wspólną metodę B stosujemy <b>do obu pozycji</b>, bez niezależnego MIN.\n- Internet B₁=81,333…; TV B₂=59,333…\n- Przy standardowym zaokrągleniu pojedynczych kwot mamy 81,33+59,33=140,66, więc trzeba uzgodnić 0,01 zł do łącznej należności 140,67 zł.\n- <b>Przykładowe</b> wyrównanie techniczne: Internet należność 81,34 (różnica faktury +18,66), TV należność 59,33 (różnica −9,33). Suma korekt: +9,33 zł.\n- Przypisanie 0,01 zł do konkretnej pozycji jest propozycją techniczną, <b>nie zatwierdzoną regułą VAT/księgowania</b>.\n\n## Kryterium testu\n\n- [ ] Wybrano metodę B <b>dla koszyka</b>.\n- [ ] Wszystkie pozycje korzystają z tej samej B.\n- [ ] Suma należności pozycji = 140,67 zł.\n- [ ] Suma korekt pozycji = 9,33 zł.\n- [ ] Nie znika korekta ze znakiem minus na jednej pozycji.\n- [ ] Bez zatwierdzonej polityki D11 pozycje są oznaczone jako wymagające kontroli księgowej.\n\nPowiązania: <mention url=\"https://app.notion.com/p/414daa43f56881fb972acdf7511d52fa\">D23 — Alokacja łącznego MIN(A,B) na usługi/pozycje faktury</mention> · <mention url=\"https://app.notion.com/p/414daa43f568818f97e4fa91a12935e1\">D11 — Korekty brutto/netto, rozbicie VAT i moment zaokrągleń</mention>.\n"
+    },
+    {
+      "id": "T27",
+      "url": "https://app.notion.com/p/416daa43f56881a2a2accf5330854c47",
+      "lastEdited": "2026-11-12T09:59:29.435Z",
+      "body": "\n## Parametry wejściowe\n\n- Miesiąc 31-dniowy, zmiana T=18.03.2027, d=17, r=14.\n- Internet: 100 zł → 70 zł, F=100 zł.\n- TV: 50 zł → 80 zł, F=50 zł.\n- Koszyk łącznie: O=N=150 zł.\n\n## Kryterium dla wyniku łącznego\n\n- Globalnie A=150 zł i B=150 zł; należność = <b>150,00 zł</b>; korekta sumaryczna = <b>0,00 zł</b>.\n- <b>Błąd:</b> wybranie MIN per pozycja dałoby Internet MIN(87,86)=86 i TV MIN(63,64)=63, czyli 149 zł, czego nie wolno robić.\n- Gdy suma koszyka pozostaje bez zmiany, a zmieniają się jego składniki, rozbicie wartości per pozycja nadal wymaga deterministycznej decyzji o metodzie prezentacji i zgodności z dokumentem w MMS (D11). Nie zakładać, że „korekta łączna 0” oznacza brak potrzeby zmian na wszystkich pozycjach.\n\n## Kontrola\n\n- [ ] Wynik sumaryczny nie zmienił się o nieuzasadniony 1 zł.\n- [ ] Nie ma niezależnego MIN dla każdej pozycji.\n- [ ] Wartości wierszy sumują się do 150 zł.\n- [ ] Księgowe ujęcie kompensujących się korekt jest oznaczone jako temat D11.\n\nPowiązania: <mention url=\"https://app.notion.com/p/414daa43f56881fb972acdf7511d52fa\">D23 — Alokacja łącznego MIN(A,B) na usługi/pozycje faktury</mention> · <mention url=\"https://app.notion.com/p/414daa43f568818f97e4fa91a12935e1\">D11 — Korekty brutto/netto, rozbicie VAT i moment zaokrągleń</mention>.\n"
+    }
+  ]
+}

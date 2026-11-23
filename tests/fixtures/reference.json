@@ -1,0 +1,549 @@
+[
+  {
+    "id": "T01",
+    "source": "https://app.notion.com/p/414daa43f5688182bff2fc0acb77998e",
+    "input": {
+      "month": "2027-02",
+      "effectiveDate": "2027-02-18",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "128.33",
+      "delta": "21.67",
+      "method": "A",
+      "a": "128.33",
+      "b": "131.67"
+    }
+  },
+  {
+    "id": "T02",
+    "source": "https://app.notion.com/p/414daa43f568810eac24d7b0e0da1cd0",
+    "input": {
+      "month": "2028-02",
+      "effectiveDate": "2028-02-18",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "128.33",
+      "delta": "21.67",
+      "method": "A",
+      "a": "128.33",
+      "b": "130.00"
+    }
+  },
+  {
+    "id": "T03",
+    "source": "https://app.notion.com/p/414daa43f568819589e2f40a32476695",
+    "input": {
+      "month": "2026-11",
+      "effectiveDate": "2026-11-18",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "128.33",
+      "delta": "21.67",
+      "method": "A=B",
+      "a": "128.33",
+      "b": "128.33"
+    }
+  },
+  {
+    "id": "T04",
+    "source": "https://app.notion.com/p/414daa43f568818f83badac44f59e30d",
+    "input": {
+      "month": "2027-03",
+      "effectiveDate": "2027-03-18",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "126.67",
+      "delta": "23.33",
+      "method": "B",
+      "a": "128.33",
+      "b": "126.67"
+    }
+  },
+  {
+    "id": "T05",
+    "source": "https://app.notion.com/p/414daa43f5688156a057f8a77254dbab",
+    "input": {
+      "month": "2026-11",
+      "effectiveDate": "2026-11-18",
+      "type": "WYPOWIEDZENIE",
+      "old": "150",
+      "new": "0",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "85.00",
+      "delta": "65.00",
+      "method": "A=B",
+      "a": "85.00",
+      "b": "85.00"
+    }
+  },
+  {
+    "id": "T06",
+    "source": "https://app.notion.com/p/414daa43f56881a8995eda3594b15ba9",
+    "input": {
+      "month": "2027-02",
+      "effectiveDate": "2027-02-18",
+      "type": "WYPOWIEDZENIE",
+      "old": "150",
+      "new": "0",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "85.00",
+      "delta": "65.00",
+      "method": "A",
+      "a": "85.00",
+      "b": "95.00"
+    }
+  },
+  {
+    "id": "T07",
+    "source": "https://app.notion.com/p/414daa43f56881789e16f1846e2440aa",
+    "input": {
+      "month": "2027-03",
+      "effectiveDate": "2027-03-18",
+      "type": "WYPOWIEDZENIE",
+      "old": "150",
+      "new": "0",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "80.00",
+      "delta": "70.00",
+      "method": "B",
+      "a": "85.00",
+      "b": "80.00"
+    }
+  },
+  {
+    "id": "T08",
+    "source": "https://app.notion.com/p/414daa43f56881298c77de61efbe2f47",
+    "input": {
+      "month": "2027-03",
+      "effectiveDate": "2027-03-02",
+      "type": "WYPOWIEDZENIE",
+      "old": "150",
+      "new": "0",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "0.00",
+      "delta": "150.00",
+      "method": "B",
+      "a": "5.00",
+      "b": "0.00"
+    }
+  },
+  {
+    "id": "T09",
+    "source": "https://app.notion.com/p/414daa43f56881a8ac54f0d0b1d3ed46",
+    "input": {
+      "month": "2027-03",
+      "effectiveDate": "2027-03-01",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "100.00",
+      "delta": "50.00",
+      "method": "Pełna N",
+      "a": "100.00",
+      "b": "98.33"
+    }
+  },
+  {
+    "id": "T10",
+    "source": "https://app.notion.com/p/414daa43f568819bbbb5fdae627e350d",
+    "input": {
+      "month": "2027-03",
+      "effectiveDate": "2027-03-02",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "100.00",
+      "delta": "50.00",
+      "method": "B",
+      "a": "101.67",
+      "b": "100.00"
+    }
+  },
+  {
+    "id": "T11",
+    "source": "https://app.notion.com/p/414daa43f5688179beaec9c3a017393f",
+    "input": {
+      "month": "2027-03",
+      "effectiveDate": "2027-03-31",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "148.33",
+      "delta": "1.67",
+      "method": "B",
+      "a": "150.00",
+      "b": "148.33"
+    }
+  },
+  {
+    "id": "T12",
+    "source": "https://app.notion.com/p/414daa43f56881109158facf1198e79b",
+    "input": {
+      "month": "2027-02",
+      "effectiveDate": "2027-02-28",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "145.00",
+      "delta": "5.00",
+      "method": "A",
+      "a": "145.00",
+      "b": "148.33"
+    }
+  },
+  {
+    "id": "T13",
+    "source": "https://app.notion.com/p/414daa43f5688187857fd46f20edca33",
+    "input": {
+      "month": "2026-11",
+      "effectiveDate": "2026-12-01",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "150.00",
+      "delta": "0.00",
+      "method": "Pełna O",
+      "a": "150.00",
+      "b": "150.00"
+    }
+  },
+  {
+    "id": "T14",
+    "source": "https://app.notion.com/p/414daa43f56881089dd2da7ac2c4b070",
+    "input": {
+      "month": "2026-12",
+      "effectiveDate": "2026-11-18",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "100.00",
+      "delta": "50.00",
+      "method": "Pełna N",
+      "a": "100.00",
+      "b": "98.33"
+    }
+  },
+  {
+    "id": "T15",
+    "source": "https://app.notion.com/p/414daa43f56881dfa660e45423eda2a8",
+    "input": {
+      "month": "2026-11",
+      "effectiveDate": "2026-11-18",
+      "type": "PODWYŻKA",
+      "old": "150",
+      "new": "180",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "150.00",
+      "delta": "0.00",
+      "method": "Pełna O",
+      "a": "163.00",
+      "b": "163.00"
+    }
+  },
+  {
+    "id": "T16",
+    "source": "https://app.notion.com/p/414daa43f568813bad94df34a6b68484",
+    "input": {
+      "month": "2027-02",
+      "effectiveDate": "2027-02-18",
+      "type": "PODWYŻKA",
+      "old": "150",
+      "new": "180",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "150.00",
+      "delta": "0.00",
+      "method": "Pełna O",
+      "a": "163.00",
+      "b": "161.00"
+    }
+  },
+  {
+    "id": "T17",
+    "source": "https://app.notion.com/p/414daa43f56881f8aea9e7377d5bbe65",
+    "input": {
+      "month": "2027-03",
+      "effectiveDate": "2027-03-18",
+      "type": "PODWYŻKA",
+      "old": "150",
+      "new": "180",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "150.00",
+      "delta": "0.00",
+      "method": "Pełna O",
+      "a": "163.00",
+      "b": "164.00"
+    }
+  },
+  {
+    "id": "T18",
+    "source": "https://app.notion.com/p/414daa43f56881fc8823fdb90ed9ab66",
+    "input": {
+      "month": "2027-03",
+      "effectiveDate": "2027-03-01",
+      "type": "PODWYŻKA",
+      "old": "150",
+      "new": "180",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "180.00",
+      "delta": "-30.00",
+      "method": "Pełna N",
+      "a": "180.00",
+      "b": "181.00"
+    }
+  },
+  {
+    "id": "T19",
+    "source": "https://app.notion.com/p/414daa43f568812eb39af089de448d46",
+    "input": {
+      "month": "2026-12",
+      "effectiveDate": "2026-11-18",
+      "type": "PODWYŻKA",
+      "old": "150",
+      "new": "180",
+      "invoiced": "180",
+      "paid": "180",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "180.00",
+      "delta": "0.00",
+      "method": "Pełna N",
+      "a": "180.00",
+      "b": "181.00"
+    }
+  },
+  {
+    "id": "T20",
+    "source": "https://app.notion.com/p/414daa43f568812ba248d13d1c860ebf",
+    "input": {
+      "month": "2027-02",
+      "effectiveDate": "2027-02-18",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "150",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "150.00",
+      "delta": "0.00",
+      "method": "Pełna O",
+      "a": "150.00",
+      "b": "150.00"
+    }
+  },
+  {
+    "id": "T21",
+    "source": "https://app.notion.com/p/414daa43f56881d69ae9ea0d5e00ad02",
+    "input": {
+      "month": "2026-11",
+      "effectiveDate": "2026-11-18",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "150",
+      "paid": "0",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "128.33",
+      "delta": "21.67",
+      "method": "A=B",
+      "a": "128.33",
+      "b": "128.33"
+    }
+  },
+  {
+    "id": "T22",
+    "source": "https://app.notion.com/p/414daa43f56881ac9f25dc2310cd6a93",
+    "input": {
+      "month": "2026-11",
+      "effectiveDate": "2026-11-18",
+      "type": "PODWYŻKA",
+      "old": "145",
+      "new": "150",
+      "invoiced": "145",
+      "paid": "145",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "145.00",
+      "delta": "0.00",
+      "method": "Pełna O",
+      "a": "147.17",
+      "b": "147.17"
+    }
+  },
+  {
+    "id": "T23",
+    "source": "https://app.notion.com/p/414daa43f56881b58347c70127516f81",
+    "input": {
+      "month": "2026-11",
+      "effectiveDate": "2026-11-18",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "130",
+      "paid": "0",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "128.33",
+      "delta": "1.67",
+      "method": "A=B",
+      "a": "128.33",
+      "b": "128.33"
+    }
+  },
+  {
+    "id": "T24",
+    "source": "https://app.notion.com/p/414daa43f56881d1bf49d8faa49ebc5d",
+    "input": {
+      "month": "2028-02",
+      "effectiveDate": "2028-02-29",
+      "type": "DOWNGRADE",
+      "old": "150",
+      "new": "100",
+      "invoiced": "150",
+      "paid": "150",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "146.67",
+      "delta": "3.33",
+      "method": "A",
+      "a": "146.67",
+      "b": "148.33"
+    }
+  },
+  {
+    "id": "T25",
+    "source": "https://app.notion.com/p/414daa43f56881e5b64fc73666a2fda5",
+    "input": {
+      "month": "2026-12",
+      "effectiveDate": "2026-12-01",
+      "type": "PODWYŻKA",
+      "old": "150.00",
+      "new": "180.00",
+      "invoiced": "180.00",
+      "basis": "gross",
+      "dateVerified": true
+    },
+    "expected": {
+      "due": "180.00",
+      "delta": "0.00",
+      "method": "Pełna N"
+    }
+  }
+]
