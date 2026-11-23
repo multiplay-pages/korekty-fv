@@ -1,6 +1,6 @@
 import { SERVICES, formatPln, formatDate } from './basket.mjs';
 import { buildInvoicePlan } from './invoice-plan.mjs';
-import { DAILY_RULE, buildDailySummary } from './daily-proration.mjs';
+import { DAILY_RULE, billingLabel, buildDailySummary } from './daily-proration.mjs';
 
 /** Wolne opisy/identyfikatory celowo nie są kopiowane — mogą zawierać dane klienta. */
 export function buildSummary(result) {
@@ -12,7 +12,7 @@ export function buildSummary(result) {
     `Okres: ${r.month.split('-').reverse().join('.')}; T: ${formatDate(r.effectiveDate)}${r.lastOldDate?`; E: ${formatDate(r.lastOldDate)}`:''}.`,
     `Datę zmiany wprowadził użytkownik; kalkulator nie ustala skuteczności oświadczenia.`,
     `Dni miesiąca: ${g.daysInMonth}; stare warunki: ${g.daysOld}; nowe warunki: ${g.daysNew}.`,
-    `Metoda globalna: ${g.method}.`,
+    `Sposób naliczenia: ${billingLabel(g.method)}.`,
     `Dotychczasowy abonament miesięczny: ${formatPln(r.totals.old)}; nowy miesięczny: ${formatPln(r.totals.new)}; już naliczono na fakturze: ${formatPln(r.totals.invoiced)}.`,
     `Należność za miesiąc: ${formatPln(g.due)}. Różnica F − należność: ${formatPln(g.delta,true)}.`,
     'Dla różnicy F − należność: plus oznacza zmniejszenie naliczenia, minus dodatkową należność do weryfikacji. Różnica nie jest kwotą zwrotu.',
@@ -22,6 +22,7 @@ export function buildSummary(result) {
     `Reszta nieprzypisana do pozycji: ${formatPln(r.residual,true)}. Polityka groszy i VAT wymaga D11.`,
     `Kontrola: suma pozycji + reszta = należność koszyka. ${r.reconciled?'Brak rozbieżności groszowej.':'Suma samych pozycji różni się od koszyka — nie przepisywać bez uzgodnienia.'}`,
   ];
+  if(g.method==='A'||g.method==='B'||g.method==='A=B') text.splice(6,0,'Porównanie A/B wykonano na całym koszyku przed zaokrągleniem; ten sam wybrany wariant zastosowano do wszystkich pozycji.');
   // W kopii najpierw konkretne kwoty do korekty, a niżej pomocnicza kontrola wzorów.
   const calculationDetails=text.splice(4);
   const plan=buildInvoicePlan(result);
