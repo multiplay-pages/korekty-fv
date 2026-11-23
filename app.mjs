@@ -1,4 +1,4 @@
-import { formatPln, formatDate, SERVICES } from './src/basket.mjs';
+import { evaluateBasket, formatPln, formatDate, SERVICES } from './src/basket.mjs';
 import { evaluateDailyBasket, billingLabel, calculationSteps } from './src/daily-proration.mjs';
 import { buildSummary } from './src/summary.mjs';
 import { example } from './src/examples.mjs';
@@ -87,6 +87,7 @@ function syncInvoice(tr) {
 }
 function readForm() {
   return {
+    calculationMode:document.querySelector('input[name="calculation-mode"]:checked').value,
     month:$('month').value,effectiveDate:$('effective-date').value,type:$('event-type').value,
     lastOldDate:$('event-type').value==='WYPOWIEDZENIE'?$('last-old-date').value:'',
     dateVerified:true,multipleDates:$('multiple-dates').checked,unresolvedDiscounts:$('unresolved-discounts').checked,
@@ -142,7 +143,7 @@ function renderInvoicePlan(result) {
     text('invoice-parts-total','Do uzgodnienia');text('invoice-model-note','');
     text('invoice-plan-control','Zachowano należność koszyka. Nie ustalono rozbicia między stary i nowy abonament; wymagana decyzja dla kompensujących się zmian pozycji.');
     $('invoice-plan-status').className='message escalation';
-    return;
+    return plan;
   }
   $('invoice-plan-status').className='message info';
   $('residual-heading').hidden=!plan.needsRoundingReview;
@@ -170,27 +171,38 @@ function renderInvoicePlan(result) {
     if(result.global.method==='NO_SERVICE')note='Przez cały analizowany miesiąc usługa jest zakończona. Należność wynosi 0,00 zł.';
     if(plan.higherPriceStart)note=`${!result.effectiveDate.startsWith(result.month)?'Data zmiany leży poza analizowanym miesiącem. ':''}${result.global.method==='UPGRADE_NEXT_MONTH'?'Podwyżka w trakcie miesiąca: dotychczasowa cena do końca miesiąca, bez cząstkowej dopłaty.':note} Wyższy abonament od ${formatDate(plan.higherPriceStart)}.`;
     text('invoice-model-note',note);
-  } else text('invoice-model-note',`Liczymy faktyczne dni obu okresów: ${plan.calendarOld?.days??0} dni dotychczasowego i ${plan.calendarNew?.days??0} dni nowego abonamentu. Każdą część mnożymy przez cenę po rabatach i dzielimy przez 30. Nie dodajemy ani nie odejmujemy dni, aby wyrównać miesiąc do 30.`);
+  } else if(result.rule) text('invoice-model-note',`Liczymy faktyczne dni obu okresów: ${plan.calendarOld?.days??0} dni dotychczasowego i ${plan.calendarNew?.days??0} dni nowego abonamentu. Każdą część mnożymy przez cenę po rabatach i dzielimy przez 30. Nie dodajemy ani nie odejmujemy dni, aby wyrównać miesiąc do 30.`);
+  else text('invoice-model-note',`Dla całego koszyka wybrano jeden niższy wariant A/B. Podział każdej pozycji stosuje współczynniki: stary abonament ${plan.oldUnits}/30, nowy abonament ${plan.newUnits}/30.`);
+  return plan;
+}
+function resultSteps(result,plan,row) {
+  if(result.rule)return calculationSteps(row);
+  if(result.global.method==='A'||result.global.method==='B'||result.global.method==='A=B')return [
+    `Stary abonament: ${formatPln(row.oldCharge)} (${plan.oldUnits}/30 pełnej ceny).`,
+    `Nowy abonament: ${formatPln(row.newCharge)} (${plan.newUnits}/30 pełnej ceny).`,
+    `Dla całego koszyka wybrano wariant ${result.global.method==='A=B'?'A/B (oba dają tę samą kwotę)':result.global.method}, bo daje niższą należność przed zaokrągleniem.`
+  ];
+  return [row.newPeriod?`Pełny nowy abonament: ${formatPln(row.newCharge)}.`:`Pełny dotychczasowy abonament: ${formatPln(row.oldCharge)}.`];
 }
 function render(result) {
   const r=result,g=r.global;
-  renderInvoicePlan(result);
+  const plan=renderInvoicePlan(result);
   text('total-old',formatPln(r.totals.old));text('total-new',formatPln(r.totals.new));text('total-invoiced',formatPln(r.totals.invoiced));
   const correction=correctionAction(g.delta);
   text('due',formatPln(g.due)); text('delta-action',correction.label); text('delta',correction.amount); text('global-method',billingLabel(g.method));
   text('nominal-price',formatPln(r.totals.new));
   text('result-period',`${r.month.split('-').reverse().join('.')} · zmiana od ${formatDate(r.effectiveDate)}${r.lastOldDate?` · ostatni dzień usługi: ${formatDate(r.lastOldDate)}`:''}`);
   text('delta-explanation',correction.explanation);
-  text('method-explanation',g.method==='PARTIAL_DAYS_30'?'Ceny po rabatach × dni korzystania ÷ 30.':'Szczegóły naliczenia i daty poniżej.');
+  text('method-explanation',r.rule?'Ceny po rabatach × dni korzystania ÷ 30.':(g.method==='A'||g.method==='B'||g.method==='A=B')?'Porównujemy dwa warianty i wybieramy niższą należność dla całego koszyka.':'Szczegóły naliczenia i daty poniżej.');
   text('days-month',g.daysInMonth);text('days-old',g.daysOld);text('days-new',g.daysNew);
   const steps=$('calculation-steps');steps.replaceChildren();
-  if(r.invoicePlan.available)for(const row of r.invoicePlan.rows) {
+  if(plan.available)for(const row of plan.rows) {
     const article=document.createElement('article');article.className='calculation-step';
     const heading=document.createElement('h3');heading.textContent=`${row.number}. ${SERVICES[row.service]}`;article.append(heading);
-    for(const step of calculationSteps(row)){const p=document.createElement('p');p.textContent=step;article.append(p);}
+    for(const step of resultSteps(r,plan,row)){const p=document.createElement('p');p.textContent=step;article.append(p);}
     const sum=document.createElement('p');sum.className='step-sum';sum.textContent=`Razem: ${formatPln(row.oldCharge)} + ${formatPln(row.newCharge)} = ${formatPln(row.partsTotal)}.`;article.append(sum);steps.append(article);
   } else {const p=document.createElement('p');p.textContent='Rozbicie zmienionych składników wymaga uzgodnienia z rozliczeniami.';steps.append(p);}
-  text('formula-note','Część miesiąca: cena po rabatach × rzeczywista liczba dni ÷ 30. Zaokrąglamy dopiero wynik części do groszy, nie stawkę dzienną. Pełny miesiąc bez zmiany ceny zachowuje pełny abonament.');
+  text('formula-note',r.rule?'Część miesiąca: cena po rabatach × rzeczywista liczba dni ÷ 30. Zaokrąglamy dopiero wynik części do groszy, nie stawkę dzienną. Pełny miesiąc bez zmiany ceny zachowuje pełny abonament.':'Wariant A/B: najpierw porównujemy dwa wyniki dla całego koszyka, przed zaokrągleniem. Do wszystkich pozycji stosujemy potem jeden wybrany wariant; nie wybieramy niższej kwoty osobno dla każdej usługi.');
   const body=$('line-results').tBodies[0];body.replaceChildren();
   for(const row of r.rows) {
     const tr=document.createElement('tr');
@@ -246,7 +258,8 @@ form.addEventListener('submit',event=>{
       missing.forEach(([label,field],index)=>{const li=document.createElement('li'),button=document.createElement('button');li.id=`error-description-${index}`;button.type='button';button.className='missing-link';button.textContent=label;button.addEventListener('click',()=>field.focus());li.append(button);list.append(li);field.setAttribute('aria-invalid','true');field.setAttribute('aria-describedby',li.id);});
       box.append(list);box.hidden=false;box.focus();text('form-feedback','Uzupełnij wskazane pola i oblicz ponownie.');return;
     }
-    render(evaluateDailyBasket(readForm()));
+    const {calculationMode,...data}=readForm();
+    render(calculationMode==='AB_MIN'?evaluateBasket(data):evaluateDailyBasket(data));
   } catch(error) {showError(error);}
 });
 $('add-position').addEventListener('click',()=>{invalidate();addRow();tbody.lastElementChild.querySelector('input').focus();});
