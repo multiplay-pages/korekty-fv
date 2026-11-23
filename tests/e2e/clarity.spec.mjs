@@ -1,4 +1,3 @@
-Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 import {test,expect} from '@playwright/test';
 
 test.beforeEach(async ({page})=>{await page.goto('/');});
@@ -68,4 +67,3 @@ test('zmiana miesiąca wymaga ponownego sprawdzenia kwot faktury',async({page})=
   await page.locator('#month').fill('2027-03');
   await expect(page.locator('[data-invoice-confirm]')).not.toBeChecked();
 });
-

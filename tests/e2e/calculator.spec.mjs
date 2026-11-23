@@ -1,4 +1,3 @@
-Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 import { test as base, expect } from '@playwright/test';
 
 const APP_ORIGIN = 'http://127.0.0.1:4173';
@@ -681,4 +680,3 @@ for (const viewport of [
     await page.screenshot({ path: testInfo.outputPath(`${browserName}-${project}-${viewport.name}-calculator.png`), fullPage: true });
   });
 }
-

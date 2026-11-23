@@ -1,4 +1,3 @@
-Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 import { formatPln, formatDate, SERVICES } from './src/basket.mjs';
 import { evaluateDailyBasket, billingLabel, calculationSteps } from './src/daily-proration.mjs';
 import { buildSummary } from './src/summary.mjs';
@@ -282,4 +281,3 @@ $('copy-summary').addEventListener('click',async()=>{
   }
 });
 addRow();
-
