@@ -4,7 +4,7 @@ test('błąd kwoty wskazuje pozycję i pole, wiąże opis i przenosi fokus',asyn
   await page.goto('/');await page.locator('#example-select').selectOption('T26');await page.locator('#load-example').click();
   const field=page.locator('#positions tbody tr').nth(1).locator('[data-field="invoiced"]');
   await page.locator('#positions tbody tr').nth(1).locator('[data-invoice-override]').check();
-  await field.fill('-1');await page.locator('#calculate').click();
+  await field.fill('-1');await page.locator('#positions tbody tr').nth(1).locator('[data-invoice-confirm]').check();await page.locator('#calculate').click();
   await expect(page.locator('#errors')).toContainText('Pozycja 2');
   await expect(page.locator('#errors')).toContainText(/faktur/i);
   await expect(field).toHaveAttribute('aria-describedby','error-description');

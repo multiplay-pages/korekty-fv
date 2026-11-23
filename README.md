@@ -111,8 +111,8 @@ nadal opisuje wcześniejszy MIN(A,B); nie aktualizowano zdalnych dokumentów ani
 podobnie właściwe bramki przed produkcją. Opisy innych operatorów nie stanowią podstawy umownej Multiplay.
 
 Wyłącznie127.0.0.1, jawna lista zasobów GET/HEAD, no-store i CSP connect-src none.
-Brak integracji MMS, danych klientów, zapisu w przeglądarce, bazy, telemetryki i publikacji.
-Repozytorium `multiplay-pages/korekty-fv` i GitHub Pages istnieją; lokalne poprawki
-formularza nie zostały jeszcze do nich wprowadzone. Nie zmieniano Notion.
+Brak integracji MMS, danych klientów, zapisu w przeglądarce, bazy i telemetryki.
+Wersja testowa jest dostępna w GitHub Pages z repozytorium `multiplay-pages/korekty-fv`.
+Nie zmieniano Notion; aplikacja nadal wymaga zatwierdzeń przed użyciem produkcyjnym.
 Kontynuację zaczynaj od nadrzędnego STAN_PROJEKTU.md i najnowszego raportu.
 

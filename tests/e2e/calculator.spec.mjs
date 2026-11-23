@@ -88,6 +88,7 @@ async function loadExample(page, example) {
 }
 
 async function calculateVerified(page) {
+  for (const confirmation of await page.locator('[data-invoice-confirm]').all()) await confirmation.check();
   await page.locator('#calculate').click();
   await expect(page.locator('#invoice-plan')).toBeVisible();
   await expect(page.locator('#copy-summary')).toBeEnabled();
@@ -131,6 +132,7 @@ async function fillManualCase(page, overrides = {}) {
   if (input.invoiced.replace(',', '.') !== input.old.replace(',', '.')) {
     await setInvoiceOverride(page, 0, input.invoiced);
   }
+  await positions(page).nth(0).locator('[data-invoice-confirm]').check();
 }
 
 async function expectBlocked(page, explanation) {
@@ -393,11 +395,11 @@ test('future upgrade explains its actual higher price date outside the analyzed 
   await expect(page.locator('#summary')).toHaveValue(/od 01\.03\.2027/);
 });
 
-test('rejects inconsistent termination E and accepts the preceding day', async ({ page }) => {
+test('termination derives the first day without service from the last service day', async ({ page }) => {
   await loadExample(page, 'T08');
   await expect(page.locator('#last-old-date')).toBeVisible();
   await page.locator('#last-old-date').fill('2027-03-02');
-  await expectBlocked(page, /INCONSISTENT_DATES|bezpośrednio|poprzed|E\b|dat/i);
+  await expect(page.locator('#effective-date')).toHaveValue('2027-03-03');
   await page.locator('#last-old-date').fill('2027-03-01');
   await calculateVerified(page);
   await expectMoney(page.locator('#due'), '5.00');
@@ -442,7 +444,7 @@ test('rejects malformed money instead of coercing or rounding the input', async 
   for (const invalid of ['', '-1', '1e2', '1,001', '1 000,00', 'NaN', '1000000000000000']) {
     await test.step(`old=${JSON.stringify(invalid)}`, async () => {
       await fillManualCase(page, { old: invalid });
-      await expectBlocked(page, /INVALID_MONEY|kwot|PLN|grosz|cyfr|miejsc/i);
+      await expectBlocked(page, invalid==='' ? /Dotychczasowy abonament/i : /INVALID_MONEY|kwot|PLN|grosz|cyfr|miejsc/i);
     });
   }
 });
@@ -616,6 +618,8 @@ test('supports keyboard activation and keeps meaningful focus on controls', asyn
     const active = document.activeElement;
     return active instanceof HTMLElement && active !== document.body && active.getClientRects().length > 0;
   })).toBe(true);
+  await positions(page).nth(0).locator('[data-invoice-confirm]').focus();
+  await page.keyboard.press('Space');
   await page.locator('#calculate').focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('#invoice-plan')).toBeVisible();

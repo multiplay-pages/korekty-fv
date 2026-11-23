@@ -41,7 +41,7 @@ test('reset formularza usuwa także błędy i zmienione opcje rozliczenia',async
 });
 test('zakończenie przed miesiącem pokazuje brak opłaty i nie sugeruje nowego abonamentu',async({page})=>{
   await page.locator('#example-select').selectOption('T08');await page.locator('#load-example').click();
-  await page.locator('#last-old-date').fill('2027-02-28');await page.locator('#effective-date').fill('2027-03-01');
+  await page.locator('#last-old-date').fill('2027-02-28');await expect(page.locator('#effective-date')).toHaveValue('2027-03-01');
   await page.locator('#calculate').click();
   await expect(page.locator('#due')).toHaveText(/0,00\s+zł/);
   await expect(page.locator('#global-method')).toHaveText('Brak opłaty — usługa zakończona');
