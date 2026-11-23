@@ -7,7 +7,7 @@ const round30=value=>value<0n?-((-value+15n)/30n):(value+15n)/30n;
 const rangeText=range=>range?`${formatDate(range.from)}–${formatDate(range.to)}`:'brak opłaty w tym miesiącu';
 
 export function billingLabel(mode) {
-  return ({PARTIAL_DAYS_30:'Rzeczywiste dni ÷ 30',MONTHLY_OLD:'Pełny dotychczasowy abonament',MONTHLY_NEW:'Pełny nowy abonament',NO_SERVICE:'Brak opłaty — usługa zakończona',UNCHANGED:'Cena miesięczna bez zmian',UPGRADE_NEXT_MONTH:'Podwyżka od następnego miesiąca',COMPONENT_REVIEW:'Zmiana składników — do sprawdzenia'})[mode]??'Pełny miesiąc';
+  return ({PARTIAL_DAYS_30:'Rzeczywiste dni ÷ 30',MONTHLY_OLD:'Pełny dotychczasowy abonament',MONTHLY_NEW:'Pełny nowy abonament',NO_SERVICE:'Brak opłaty — usługa zakończona',UNCHANGED:'Cena miesięczna bez zmian',UPGRADE_NEXT_MONTH:'Podwyżka od następnego miesiąca',COMPONENT_REVIEW:'Zmiana składników — do sprawdzenia',A:'Porównanie A/B — wybrano A',B:'Porównanie A/B — wybrano B','A=B':'Porównanie A/B — oba warianty są równe','Pełna O':'Pełny dotychczasowy abonament','Pełna N':'Pełny nowy abonament'})[mode]??'Pełny miesiąc';
 }
 
 /** Nowa reguła właściciela; dotychczasowy adapter dostarcza tylko walidację i kalendarz.
