@@ -1,0 +1,388 @@
+TAP version 13
+# Subtest: T01: należność, różnica, polityka i kontrolne A/B z Notion
+ok 1 - T01: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 2.2313
+  type: 'test'
+  ...
+# Subtest: T02: należność, różnica, polityka i kontrolne A/B z Notion
+ok 2 - T02: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.1541
+  type: 'test'
+  ...
+# Subtest: T03: należność, różnica, polityka i kontrolne A/B z Notion
+ok 3 - T03: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.1179
+  type: 'test'
+  ...
+# Subtest: T04: należność, różnica, polityka i kontrolne A/B z Notion
+ok 4 - T04: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.1189
+  type: 'test'
+  ...
+# Subtest: T05: należność, różnica, polityka i kontrolne A/B z Notion
+ok 5 - T05: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.1354
+  type: 'test'
+  ...
+# Subtest: T06: należność, różnica, polityka i kontrolne A/B z Notion
+ok 6 - T06: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.1159
+  type: 'test'
+  ...
+# Subtest: T07: należność, różnica, polityka i kontrolne A/B z Notion
+ok 7 - T07: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.106
+  type: 'test'
+  ...
+# Subtest: T08: należność, różnica, polityka i kontrolne A/B z Notion
+ok 8 - T08: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0922
+  type: 'test'
+  ...
+# Subtest: T09: należność, różnica, polityka i kontrolne A/B z Notion
+ok 9 - T09: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0953
+  type: 'test'
+  ...
+# Subtest: T10: należność, różnica, polityka i kontrolne A/B z Notion
+ok 10 - T10: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.1372
+  type: 'test'
+  ...
+# Subtest: T11: należność, różnica, polityka i kontrolne A/B z Notion
+ok 11 - T11: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.1011
+  type: 'test'
+  ...
+# Subtest: T12: należność, różnica, polityka i kontrolne A/B z Notion
+ok 12 - T12: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0705
+  type: 'test'
+  ...
+# Subtest: T13: należność, różnica, polityka i kontrolne A/B z Notion
+ok 13 - T13: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0495
+  type: 'test'
+  ...
+# Subtest: T14: należność, różnica, polityka i kontrolne A/B z Notion
+ok 14 - T14: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0413
+  type: 'test'
+  ...
+# Subtest: T15: należność, różnica, polityka i kontrolne A/B z Notion
+ok 15 - T15: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0516
+  type: 'test'
+  ...
+# Subtest: T16: należność, różnica, polityka i kontrolne A/B z Notion
+ok 16 - T16: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0434
+  type: 'test'
+  ...
+# Subtest: T17: należność, różnica, polityka i kontrolne A/B z Notion
+ok 17 - T17: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0392
+  type: 'test'
+  ...
+# Subtest: T18: należność, różnica, polityka i kontrolne A/B z Notion
+ok 18 - T18: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0476
+  type: 'test'
+  ...
+# Subtest: T19: należność, różnica, polityka i kontrolne A/B z Notion
+ok 19 - T19: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0387
+  type: 'test'
+  ...
+# Subtest: T20: należność, różnica, polityka i kontrolne A/B z Notion
+ok 20 - T20: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0381
+  type: 'test'
+  ...
+# Subtest: T21: należność, różnica, polityka i kontrolne A/B z Notion
+ok 21 - T21: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0413
+  type: 'test'
+  ...
+# Subtest: T22: należność, różnica, polityka i kontrolne A/B z Notion
+ok 22 - T22: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0417
+  type: 'test'
+  ...
+# Subtest: T23: należność, różnica, polityka i kontrolne A/B z Notion
+ok 23 - T23: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0382
+  type: 'test'
+  ...
+# Subtest: T24: należność, różnica, polityka i kontrolne A/B z Notion
+ok 24 - T24: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0377
+  type: 'test'
+  ...
+# Subtest: T25: należność, różnica, polityka i kontrolne A/B z Notion
+ok 25 - T25: należność, różnica, polityka i kontrolne A/B z Notion
+  ---
+  duration_ms: 0.0703
+  type: 'test'
+  ...
+# Subtest: T26: globalny koszyk daje 140,67; alokacja D11 pozostaje poza wynikiem
+ok 26 - T26: globalny koszyk daje 140,67; alokacja D11 pozostaje poza wynikiem
+  ---
+  duration_ms: 0.0918
+  type: 'test'
+  ...
+# Subtest: T27: stała suma 150,00, nigdy 149,00; brak rozstrzygnięcia pozycji
+ok 27 - T27: stała suma 150,00, nigdy 149,00; brak rozstrzygnięcia pozycji
+  ---
+  duration_ms: 0.088
+  type: 'test'
+  ...
+# Subtest: wpłata nie wpływa na należność ani korektę dokumentu
+ok 28 - wpłata nie wpływa na należność ani korektę dokumentu
+  ---
+  duration_ms: 0.1154
+  type: 'test'
+  ...
+# Subtest: F różne od O ostrzega, a ujemna różnica nie ginie
+ok 29 - F różne od O ostrzega, a ujemna różnica nie ginie
+  ---
+  duration_ms: 0.1153
+  type: 'test'
+  ...
+# Subtest: T08: wynik zerowy jest objaśniony i nieblokowany
+ok 30 - T08: wynik zerowy jest objaśniony i nieblokowany
+  ---
+  duration_ms: 0.0708
+  type: 'test'
+  ...
+# Subtest: T20: równy koszyk oznacza brak zmiany, mimo etykiety downgrade
+ok 31 - T20: równy koszyk oznacza brak zmiany, mimo etykiety downgrade
+  ---
+  duration_ms: 0.0723
+  type: 'test'
+  ...
+# Subtest: kwoty z przecinkiem, ułamki grosza i half-up tylko po wyborze minimum
+ok 32 - kwoty z przecinkiem, ułamki grosza i half-up tylko po wyborze minimum
+  ---
+  duration_ms: 0.0707
+  type: 'test'
+  ...
+# Subtest: duże kwoty są dokładne powyżej precyzji Number w groszach
+ok 33 - duże kwoty są dokładne powyżej precyzji Number w groszach
+  ---
+  duration_ms: 0.0747
+  type: 'test'
+  ...
+# Subtest: E/T przechodzi przez koniec roku i daty poza miesiącem
+ok 34 - E/T przechodzi przez koniec roku i daty poza miesiącem
+  ---
+  duration_ms: 0.1062
+  type: 'test'
+  ...
+# Subtest: kalendarz gregoriański: 1900 zwykły, 2000 i 2028 przestępne
+ok 35 - kalendarz gregoriański: 1900 zwykły, 2000 i 2028 przestępne
+  ---
+  duration_ms: 0.1342
+  type: 'test'
+  ...
+# Subtest: brak mutacji wejścia i wynik gotowy do JSON
+ok 36 - brak mutacji wejścia i wynik gotowy do JSON
+  ---
+  duration_ms: 0.6192
+  type: 'test'
+  ...
+# Subtest: walidacja: zła data
+ok 37 - walidacja: zła data
+  ---
+  duration_ms: 0.3262
+  type: 'test'
+  ...
+# Subtest: walidacja: 1900 nie jest przestępny
+ok 38 - walidacja: 1900 nie jest przestępny
+  ---
+  duration_ms: 0.0699
+  type: 'test'
+  ...
+# Subtest: walidacja: zły miesiąc
+ok 39 - walidacja: zły miesiąc
+  ---
+  duration_ms: 0.0452
+  type: 'test'
+  ...
+# Subtest: walidacja: rok zero
+ok 40 - walidacja: rok zero
+  ---
+  duration_ms: 0.0619
+  type: 'test'
+  ...
+# Subtest: walidacja: niepotwierdzona data
+ok 41 - walidacja: niepotwierdzona data
+  ---
+  duration_ms: 0.0425
+  type: 'test'
+  ...
+# Subtest: walidacja: pozorna zgoda
+ok 42 - walidacja: pozorna zgoda
+  ---
+  duration_ms: 0.0529
+  type: 'test'
+  ...
+# Subtest: walidacja: błędny E
+ok 43 - walidacja: błędny E
+  ---
+  duration_ms: 0.0537
+  type: 'test'
+  ...
+# Subtest: walidacja: ujemna cena
+ok 44 - walidacja: ujemna cena
+  ---
+  duration_ms: 0.0448
+  type: 'test'
+  ...
+# Subtest: walidacja: float na wejściu
+ok 45 - walidacja: float na wejściu
+  ---
+  duration_ms: 0.0669
+  type: 'test'
+  ...
+# Subtest: walidacja: za dużo miejsc
+ok 46 - walidacja: za dużo miejsc
+  ---
+  duration_ms: 0.0652
+  type: 'test'
+  ...
+# Subtest: walidacja: NaN
+ok 47 - walidacja: NaN
+  ---
+  duration_ms: 0.0447
+  type: 'test'
+  ...
+# Subtest: walidacja: wykładnik
+ok 48 - walidacja: wykładnik
+  ---
+  duration_ms: 0.0446
+  type: 'test'
+  ...
+# Subtest: walidacja: pusta kwota
+ok 49 - walidacja: pusta kwota
+  ---
+  duration_ms: 0.0508
+  type: 'test'
+  ...
+# Subtest: walidacja: za duża kwota
+ok 50 - walidacja: za duża kwota
+  ---
+  duration_ms: 0.0438
+  type: 'test'
+  ...
+# Subtest: walidacja: ujemna wpłata
+ok 51 - walidacja: ujemna wpłata
+  ---
+  duration_ms: 0.0583
+  type: 'test'
+  ...
+# Subtest: walidacja: zły typ
+ok 52 - walidacja: zły typ
+  ---
+  duration_ms: 0.0471
+  type: 'test'
+  ...
+# Subtest: walidacja: sprzeczny kierunek
+ok 53 - walidacja: sprzeczny kierunek
+  ---
+  duration_ms: 0.0396
+  type: 'test'
+  ...
+# Subtest: walidacja: wypowiedzenie N>0
+ok 54 - walidacja: wypowiedzenie N>0
+  ---
+  duration_ms: 0.0373
+  type: 'test'
+  ...
+# Subtest: walidacja: brak zmiany z inną ceną
+ok 55 - walidacja: brak zmiany z inną ceną
+  ---
+  duration_ms: 0.0508
+  type: 'test'
+  ...
+# Subtest: walidacja: netto
+ok 56 - walidacja: netto
+  ---
+  duration_ms: 0.0429
+  type: 'test'
+  ...
+# Subtest: walidacja: wiele dat
+ok 57 - walidacja: wiele dat
+  ---
+  duration_ms: 0.084
+  type: 'test'
+  ...
+# Subtest: walidacja: pozycje
+ok 58 - walidacja: pozycje
+  ---
+  duration_ms: 0.0412
+  type: 'test'
+  ...
+# Subtest: walidacja: dane osobowe
+ok 59 - walidacja: dane osobowe
+  ---
+  duration_ms: 0.0551
+  type: 'test'
+  ...
+# Subtest: odrzuca wejście null
+ok 60 - odrzuca wejście null
+  ---
+  duration_ms: 0.0684
+  type: 'test'
+  ...
+# Subtest: odrzuca wejście []
+ok 61 - odrzuca wejście []
+  ---
+  duration_ms: 0.0367
+  type: 'test'
+  ...
+# Subtest: odrzuca wejście "150"
+ok 62 - odrzuca wejście "150"
+  ---
+  duration_ms: 0.0371
+  type: 'test'
+  ...
+# Subtest: odrzuca wejście undefined
+ok 63 - odrzuca wejście undefined
+  ---
+  duration_ms: 0.0288
+  type: 'test'
+  ...
+1..63
+# tests 63
+# suites 0
+# pass 63
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 116.4451

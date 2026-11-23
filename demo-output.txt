@@ -1,0 +1,42 @@
+
+> multiplay-bok-1-30-local@0.1.0-stage1 demo
+> node demo.mjs
+
+Multiplay BOK — przykład testowy; D05 i D11 pozostają otwarte.
+Należność: 128.33 PLN; różnica F − należność: 21.67 PLN; metoda: A=B
+{
+  "status": "TEST_ONLY",
+  "algorithmVersion": "0.1.0-stage1",
+  "basis": "gross",
+  "roundingPolicy": "HALF_UP_TEST_ONLY_D11_OPEN",
+  "lineAllocationStatus": "NOT_IMPLEMENTED_D11",
+  "classification": "DOWNGRADE",
+  "method": "A=B",
+  "daysInMonth": 30,
+  "daysOld": 17,
+  "daysNew": 13,
+  "a": "128.33",
+  "b": "128.33",
+  "due": "128.33",
+  "delta": "21.67",
+  "dueCents": "12833",
+  "deltaCents": "2167",
+  "exact": {
+    "a": {
+      "numerator": "385000",
+      "denominator": "30"
+    },
+    "b": {
+      "numerator": "385000",
+      "denominator": "30"
+    },
+    "due": {
+      "numerator": "385000",
+      "denominator": "30"
+    }
+  },
+  "warnings": [
+    "D05_CONTRACT_GATE_OPEN",
+    "D11_ACCOUNTING_GATE_OPEN"
+  ]
+}

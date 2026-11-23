@@ -13,23 +13,30 @@
 <a class="skip-link" href="#calculator-form">Przejdź do formularza</a>
 <header class="topbar"><div class="topbar-inner"><a class="brand" href="/" aria-label="Multiplay BOK — początek"><span class="brand-mark" aria-hidden="true">m</span><span>multiplay<span class="brand-divider">/</span><strong>BOK</strong></span></a><span class="environment">Środowisko lokalne <span aria-hidden="true">·</span> Etap 2</span></div></header>
 <main>
-  <div class="page-heading"><div><p class="eyebrow">NARZĘDZIA ROZLICZENIOWE</p><h1>Kalkulator korekt <span>1/30</span></h1><p class="intro">Oblicz stary i nowy abonament cząstkowy oraz zmianę kwoty na fakturze.</p></div><span class="badge">Wersja testowa</span></div>
+  <div class="page-heading"><div><p class="eyebrow">MULTIPLAY · NARZĘDZIA BOK</p><h1>Korekta abonamentu<br><span>bez ręcznego liczenia.</span></h1><p class="intro">Wybierz zmianę, wpisz ceny i zobacz, jak przygotować pozycje korekty.</p></div><div class="hero-visual" aria-hidden="true"><span class="hero-visual-label">MIESIĄC ROZLICZENIOWY</span><strong>1<span>/</span>30</strong><div class="hero-visual-line"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small>Stary abonament&nbsp; → &nbsp;nowy abonament</small></div><span class="badge">Wersja testowa</span></div>
   <div class="scope-note"><strong>Prototyp do testów.</strong> Wprowadzaj wyłącznie dane syntetyczne. Podstawa umowna, VAT, księgowanie i zaokrąglenia wymagają zatwierdzenia.</div>
   <form id="calculator-form" novalidate autocomplete="off">
     <div id="errors" class="error-box" role="alert" tabindex="-1" hidden></div>
     <section class="sheet" aria-labelledby="event-heading">
       <div class="section-heading"><h2 id="event-heading"><span class="step">01</span> Zdarzenie i okres</h2><span class="section-hint">Jedna wspólna data dla całego koszyka</span></div>
+      <div class="scenario-intro"><h3>Co się zmienia?</h3><p>Wybierz sytuację, którą chcesz rozliczyć.</p></div>
+      <div class="scenario-cards" role="group" aria-label="Rodzaj zmiany abonamentu">
+        <button type="button" class="scenario-card" data-scenario="DOWNGRADE" aria-pressed="true"><span class="scenario-icon" aria-hidden="true">↘</span><span><strong>Obniżenie</strong><small>Nowy abonament jest niższy</small></span></button>
+        <button type="button" class="scenario-card" data-scenario="PODWYŻKA" aria-pressed="false"><span class="scenario-icon" aria-hidden="true">↗</span><span><strong>Zwiększenie</strong><small>Nowy abonament jest wyższy</small></span></button>
+        <button type="button" class="scenario-card" data-scenario="WYPOWIEDZENIE" aria-pressed="false"><span class="scenario-icon" aria-hidden="true">■</span><span><strong>Zakończenie</strong><small>Usługa przestaje być świadczona</small></span></button>
+        <button type="button" class="scenario-card" data-scenario="NO_CHANGE" aria-pressed="false"><span class="scenario-icon" aria-hidden="true">＝</span><span><strong>Bez zmiany sumy</strong><small>Kontrola pozycji abonamentu</small></span></button>
+      </div>
       <div class="event-grid">
-        <div class="field"><label for="event-type">Co zmieniasz?</label><select id="event-type"><option value="DOWNGRADE">Przedłużenie — obniżenie abonamentu</option><option value="WYPOWIEDZENIE">Zakończenie usługi</option><option value="PODWYŻKA">Przedłużenie — zwiększenie abonamentu</option><option value="NO_CHANGE">Brak zmiany łącznej ceny / kontrola</option></select></div>
-        <div class="field"><label for="month">Miesiąc rozliczeniowy</label><input id="month" type="month" required min="0001-01" max="9999-12"><small id="month-preview"></small></div>
-        <div class="field" id="end-date-field" hidden><label for="last-old-date">Ostatni dzień usługi</label><input id="last-old-date" type="date" min="0001-01-01" max="9999-12-31"><small>Ostatni płatny dzień. Dzień bez usługi musi być następny. <span id="end-date-preview"></span></small></div>
-        <div class="field"><label for="effective-date" id="effective-label">Od kiedy obowiązuje nowy abonament?</label><input id="effective-date" type="date" required min="0001-01-01" max="9999-12-31"><small><span id="date-hint">Nowe warunki obowiązują od tego dnia włącznie.</span> <span id="date-preview"></span></small></div>
+        <div class="sr-only" aria-hidden="true"><label for="event-type">Co zmieniasz?</label><select id="event-type" tabindex="-1"><option value="DOWNGRADE">Przedłużenie — obniżenie abonamentu</option><option value="WYPOWIEDZENIE">Zakończenie usługi</option><option value="PODWYŻKA">Przedłużenie — zwiększenie abonamentu</option><option value="NO_CHANGE">Brak zmiany łącznej ceny / kontrola</option></select></div>
+        <div class="field"><label for="month">Miesiąc rozliczeniowy <span class="required-note">— wymagane</span></label><input id="month" type="month" required min="0001-01" max="9999-12"><small id="month-preview"></small></div>
+        <div class="field" id="end-date-field" hidden><label for="last-old-date">Ostatni dzień usługi <span class="required-note">— wymagane</span></label><input id="last-old-date" type="date" min="0001-01-01" max="9999-12-31"><small>Wpisz ostatni dzień świadczenia. Następny dzień obliczymy automatycznie. <span id="end-date-preview"></span></small></div>
+        <div class="field"><label for="effective-date"><span id="effective-label">Od kiedy obowiązuje nowy abonament?</span> <span id="effective-required" class="required-note">— wymagane</span></label><input id="effective-date" type="date" required min="0001-01-01" max="9999-12-31"><small><span id="date-hint">Nowe warunki obowiązują od tego dnia włącznie.</span> <span id="date-preview"></span></small></div>
       </div>
       <p class="date-note">Wpisz uzgodnioną datę zmiany lub zakończenia usługi. Kalkulator wylicza kwoty na jej podstawie.</p>
     </section>
     <section class="sheet" aria-labelledby="positions-heading">
       <div class="section-heading"><h2 id="positions-heading"><span class="step">02</span> Ceny abonamentu</h2><span class="section-hint">Pełne ceny miesięczne brutto po rabatach · zł/mies.</span></div>
-      <p class="section-copy">Wpisz pełne abonamenty miesięczne już po rabatach — części za stary i nowy okres wyliczy kalkulator. Kwotę faktury przyjmujemy jak dotychczasowy abonament; zaznacz „inna kwota”, jeśli faktyczne naliczenie jest inne. Uwzględniaj tylko opłaty cykliczne.</p>
+      <p class="section-copy">Wpisz pełne abonamenty miesięczne brutto po rabatach. Dla każdej usługi sprawdź kwotę na fakturze i potwierdź ją poniżej. Uwzględniaj tylko opłaty cykliczne.</p>
       <div id="termination-note" class="inline-note" hidden>Kończysz cały analizowany zakres — nowy abonament każdej pozycji wynosi 0,00 zł.</div>
       <table id="positions" class="entry-table simplified"><caption class="sr-only">Pełne miesięczne ceny abonamentu i kwoty już naliczone na fakturze</caption><thead><tr><th scope="col">Usługa</th><th scope="col">Dotychczasowy abonament<span class="subhead">pełny miesiąc</span></th><th scope="col">Nowy abonament<span class="subhead">pełny miesiąc</span></th><th scope="col">Już naliczono na fakturze</th><th scope="col">Szczegóły</th><th scope="col"><span class="sr-only">Usuń pozycję</span></th></tr></thead><tbody></tbody><tfoot><tr><th scope="row">Razem</th><td id="total-old">—</td><td id="total-new">—</td><td id="total-invoiced">—</td><td colspan="2">Kwoty brutto</td></tr></tfoot></table>
       <div class="table-actions"><button id="add-position" class="button secondary" type="button"><span aria-hidden="true">＋</span> Dodaj pozycję</button><span id="row-count" class="muted">1 pozycja</span></div>
@@ -42,7 +49,8 @@
     <div class="result-heading"><h2 id="result-heading" tabindex="-1"><span class="step">03</span> Jak przygotować korektę</h2><div class="result-actions"><span class="badge">Kwoty robocze</span><button id="reset-result" class="button secondary" type="button">Nowe obliczenie — resetuj wszystko</button></div></div>
     <div id="invoice-plan" class="invoice-plan" hidden>
       <p id="invoice-plan-status" class="message info"></p>
-      <table class="invoice-table"><caption class="sr-only">Stary abonament po korekcie i nowa część do dodania</caption><thead><tr><th scope="col">Usługa</th><th scope="col">Stary abonament<br>po korekcie</th><th scope="col">Nowy abonament<br>do dodania</th><th scope="col">Razem części</th><th scope="col">Reszta do uzgodnienia</th></tr></thead><tbody></tbody></table>
+      <p id="invoice-comparison" class="invoice-comparison"></p>
+      <table class="invoice-table"><caption class="sr-only">Stary abonament po korekcie i nowa część do dodania</caption><thead><tr><th scope="col">Usługa</th><th scope="col">Stary abonament<br>po korekcie</th><th scope="col">Nowy abonament<br>do dodania</th><th scope="col">Razem części</th><th id="residual-heading" scope="col">Reszta do uzgodnienia</th></tr></thead><tbody></tbody></table>
       <div class="invoice-total"><span>Razem stary i nowy abonament</span><strong id="invoice-parts-total"></strong></div>
       <p id="invoice-model-note" class="model-note"></p>
       <details class="invoice-rounding"><summary>Kontrola zgodności kwot i zaokrągleń</summary><p id="invoice-plan-control"></p></details>

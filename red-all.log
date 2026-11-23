@@ -1,0 +1,1319 @@
+✖ T01: należność, różnica, polityka i kontrolne A/B z Notion (2.6115ms)
+✖ T02: należność, różnica, polityka i kontrolne A/B z Notion (0.2316ms)
+✖ T03: należność, różnica, polityka i kontrolne A/B z Notion (0.1353ms)
+✖ T04: należność, różnica, polityka i kontrolne A/B z Notion (0.1298ms)
+✖ T05: należność, różnica, polityka i kontrolne A/B z Notion (0.1337ms)
+✖ T06: należność, różnica, polityka i kontrolne A/B z Notion (0.1074ms)
+✖ T07: należność, różnica, polityka i kontrolne A/B z Notion (0.1088ms)
+✖ T08: należność, różnica, polityka i kontrolne A/B z Notion (0.1015ms)
+✖ T09: należność, różnica, polityka i kontrolne A/B z Notion (0.1465ms)
+✖ T10: należność, różnica, polityka i kontrolne A/B z Notion (0.1672ms)
+✖ T11: należność, różnica, polityka i kontrolne A/B z Notion (0.1384ms)
+✖ T12: należność, różnica, polityka i kontrolne A/B z Notion (0.0974ms)
+✖ T13: należność, różnica, polityka i kontrolne A/B z Notion (0.0797ms)
+✖ T14: należność, różnica, polityka i kontrolne A/B z Notion (0.0873ms)
+✖ T15: należność, różnica, polityka i kontrolne A/B z Notion (0.0688ms)
+✖ T16: należność, różnica, polityka i kontrolne A/B z Notion (0.0648ms)
+✖ T17: należność, różnica, polityka i kontrolne A/B z Notion (0.0788ms)
+✖ T18: należność, różnica, polityka i kontrolne A/B z Notion (0.0661ms)
+✖ T19: należność, różnica, polityka i kontrolne A/B z Notion (0.0613ms)
+✖ T20: należność, różnica, polityka i kontrolne A/B z Notion (0.0598ms)
+✖ T21: należność, różnica, polityka i kontrolne A/B z Notion (0.0594ms)
+✖ T22: należność, różnica, polityka i kontrolne A/B z Notion (0.0631ms)
+✖ T23: należność, różnica, polityka i kontrolne A/B z Notion (0.059ms)
+✖ T24: należność, różnica, polityka i kontrolne A/B z Notion (0.0645ms)
+✖ T25: należność, różnica, polityka i kontrolne A/B z Notion (0.0689ms)
+✖ T26: globalny koszyk daje 140,67; alokacja D11 pozostaje poza wynikiem (0.1024ms)
+✖ T27: stała suma 150,00, nigdy 149,00; brak rozstrzygnięcia pozycji (0.0872ms)
+✖ wpłata nie wpływa na należność ani korektę dokumentu (0.1149ms)
+✖ F różne od O ostrzega, a ujemna różnica nie ginie (0.1012ms)
+✖ T08: wynik zerowy jest objaśniony i nieblokowany (0.1003ms)
+✖ T20: równy koszyk oznacza brak zmiany, mimo etykiety downgrade (0.0928ms)
+✖ kwoty z przecinkiem, ułamki grosza i half-up tylko po wyborze minimum (0.125ms)
+✖ duże kwoty są dokładne powyżej precyzji Number w groszach (0.0964ms)
+✖ E/T przechodzi przez koniec roku i daty poza miesiącem (0.1107ms)
+✖ kalendarz gregoriański: 1900 zwykły, 2000 i 2028 przestępne (0.1219ms)
+✔ brak mutacji wejścia i wynik gotowy do JSON (0.735ms)
+✖ walidacja: zła data (0.1947ms)
+✖ walidacja: 1900 nie jest przestępny (0.0731ms)
+✖ walidacja: zły miesiąc (0.065ms)
+✖ walidacja: rok zero (0.0799ms)
+✖ walidacja: niepotwierdzona data (0.0697ms)
+✖ walidacja: pozorna zgoda (0.0699ms)
+✖ walidacja: błędny E (0.0663ms)
+✖ walidacja: ujemna cena (0.0667ms)
+✖ walidacja: float na wejściu (0.0626ms)
+✖ walidacja: za dużo miejsc (0.0645ms)
+✖ walidacja: NaN (0.0565ms)
+✖ walidacja: wykładnik (0.0561ms)
+✖ walidacja: pusta kwota (0.0618ms)
+✖ walidacja: za duża kwota (0.0568ms)
+✖ walidacja: ujemna wpłata (0.0576ms)
+✖ walidacja: zły typ (0.0934ms)
+✖ walidacja: sprzeczny kierunek (0.0682ms)
+✖ walidacja: wypowiedzenie N>0 (0.0651ms)
+✖ walidacja: brak zmiany z inną ceną (0.0797ms)
+✖ walidacja: netto (0.0719ms)
+✖ walidacja: wiele dat (0.0687ms)
+✖ walidacja: pozycje (0.0626ms)
+✖ walidacja: dane osobowe (0.0555ms)
+✖ odrzuca wejście null (0.0774ms)
+✖ odrzuca wejście [] (0.0614ms)
+✖ odrzuca wejście "150" (0.0559ms)
+✖ odrzuca wejście undefined (0.0564ms)
+ℹ tests 63
+ℹ suites 0
+ℹ pass 1
+ℹ fail 62
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 127.1151
+
+✖ failing tests:
+
+test at tests\calculator.test.mjs:8:3
+✖ T01: należność, różnica, polityka i kontrolne A/B z Notion (2.6115ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '128.33'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '128.33',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T02: należność, różnica, polityka i kontrolne A/B z Notion (0.2316ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '128.33'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '128.33',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T03: należność, różnica, polityka i kontrolne A/B z Notion (0.1353ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '128.33'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '128.33',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T04: należność, różnica, polityka i kontrolne A/B z Notion (0.1298ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '126.67'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '126.67',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T05: należność, różnica, polityka i kontrolne A/B z Notion (0.1337ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '85.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '85.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T06: należność, różnica, polityka i kontrolne A/B z Notion (0.1074ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '85.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '85.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T07: należność, różnica, polityka i kontrolne A/B z Notion (0.1088ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '80.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '80.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T08: należność, różnica, polityka i kontrolne A/B z Notion (0.1015ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '0.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '0.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T09: należność, różnica, polityka i kontrolne A/B z Notion (0.1465ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '100.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '100.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T10: należność, różnica, polityka i kontrolne A/B z Notion (0.1672ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '100.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '100.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T11: należność, różnica, polityka i kontrolne A/B z Notion (0.1384ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '148.33'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '148.33',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T12: należność, różnica, polityka i kontrolne A/B z Notion (0.0974ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '145.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '145.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T13: należność, różnica, polityka i kontrolne A/B z Notion (0.0797ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '150.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '150.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T14: należność, różnica, polityka i kontrolne A/B z Notion (0.0873ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '100.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '100.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T15: należność, różnica, polityka i kontrolne A/B z Notion (0.0688ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '150.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '150.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T16: należność, różnica, polityka i kontrolne A/B z Notion (0.0648ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '150.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '150.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T17: należność, różnica, polityka i kontrolne A/B z Notion (0.0788ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '150.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '150.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T18: należność, różnica, polityka i kontrolne A/B z Notion (0.0661ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '180.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '180.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T19: należność, różnica, polityka i kontrolne A/B z Notion (0.0613ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '180.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '180.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T20: należność, różnica, polityka i kontrolne A/B z Notion (0.0598ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '150.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '150.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T21: należność, różnica, polityka i kontrolne A/B z Notion (0.0594ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '128.33'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '128.33',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T22: należność, różnica, polityka i kontrolne A/B z Notion (0.0631ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '145.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '145.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T23: należność, różnica, polityka i kontrolne A/B z Notion (0.059ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '128.33'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '128.33',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T24: należność, różnica, polityka i kontrolne A/B z Notion (0.0645ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '146.67'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '146.67',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:8:3
+✖ T25: należność, różnica, polityka i kontrolne A/B z Notion (0.0689ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '180.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:10:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '180.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:19:1
+✖ T26: globalny koszyk daje 140,67; alokacja D11 pozostaje poza wynikiem (0.1024ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  undefined !== 'B'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:21:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'B',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:29:1
+✖ T27: stała suma 150,00, nigdy 149,00; brak rozstrzygnięcia pozycji (0.0872ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '150.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:31:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '150.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:37:1
+✖ wpłata nie wpływa na należność ani korektę dokumentu (0.1149ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '128.33'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:40:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '128.33',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:44:1
+✖ F różne od O ostrzega, a ujemna różnica nie ginie (0.1012ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '-28.33'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:46:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '-28.33',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:50:1
+✖ T08: wynik zerowy jest objaśniony i nieblokowany (0.1003ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '0.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:52:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '0.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:56:1
+✖ T20: równy koszyk oznacza brak zmiany, mimo etykiety downgrade (0.0928ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'NO_CHANGE'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:58:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'NO_CHANGE',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:61:1
+✖ kwoty z przecinkiem, ułamki grosza i half-up tylko po wyborze minimum (0.125ms)
+  TypeError [Error]: Cannot read properties of undefined (reading 'a')
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:63:24)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests\calculator.test.mjs:69:1
+✖ duże kwoty są dokładne powyżej precyzji Number w groszach (0.0964ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '999999999999999.99'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:71:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '999999999999999.99',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:74:1
+✖ E/T przechodzi przez koniec roku i daty poza miesiącem (0.1107ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - '0.00'
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:76:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: '0.00',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:82:1
+✖ kalendarz gregoriański: 1900 zwykły, 2000 i 2028 przestępne (0.1219ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  undefined !== 28
+  
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:85:12)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 28,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: zła data (0.1947ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: 1900 nie jest przestępny (0.0731ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: zły miesiąc (0.065ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: rok zero (0.0799ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: niepotwierdzona data (0.0697ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: pozorna zgoda (0.0699ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: błędny E (0.0663ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: ujemna cena (0.0667ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: float na wejściu (0.0626ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: za dużo miejsc (0.0645ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: NaN (0.0565ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: wykładnik (0.0561ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: pusta kwota (0.0618ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: za duża kwota (0.0568ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: ujemna wpłata (0.0576ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: zły typ (0.0934ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: sprzeczny kierunek (0.0682ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: wypowiedzenie N>0 (0.0651ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: brak zmiany z inną ceną (0.0797ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: netto (0.0719ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: wiele dat (0.0687ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: pozycje (0.0626ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:118:4
+✖ walidacja: dane osobowe (0.0555ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:119:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:121:51
+✖ odrzuca wejście null (0.0774ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:122:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:121:51
+✖ odrzuca wejście [] (0.0614ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:122:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:121:51
+✖ odrzuca wejście "150" (0.0559ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:122:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests\calculator.test.mjs:121:51
+✖ odrzuca wejście undefined (0.0564ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///C:/Users/lcichanowicz/OneDrive%20-%20Multiplay/Dokumenty/ChatGPT/30/bok-1-30/tests/calculator.test.mjs:122:10)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }

@@ -50,6 +50,13 @@ Wybierz „Luty:100→80 zł od4lutego”, wczytaj i oblicz. „Skąd te kwoty?�
 działania z rzeczywistymi cenami i dniami. Nazwy przykładów nie zawierają kodów testów.
 Wpisuj pełne ceny miesięczne po rabatach; części liczy kalkulator. Kwota faktury
 domyślnie jest taka jak stary abonament, z opcją wpisania faktycznie innego naliczenia.
+Dla każdej usługi potwierdź porównanie kwoty z fakturą. Zmiana miesiąca, usługi lub
+kwoty wymaga ponownego potwierdzenia. Wbudowane przykłady są danymi testowymi i mają
+potwierdzenia zaznaczone automatycznie.
+
+Przy zakończeniu wpisz ostatni dzień usługi; pierwszy dzień bez usługi wyliczamy
+automatycznie. Zmiana scenariusza nie usuwa wpisanej wcześniej ceny nowego abonamentu.
+Po kliknięciu „Oblicz korektę” lista braków prowadzi do wymagających uzupełnienia pól.
 
 „Resetuj wszystko” przy formularzu oraz „Nowe obliczenie — resetuj wszystko” przy wyniku
 przywracają pustą pojedynczą pozycję, domyślne opcje, brak wybranego przykładu i zamknięte
@@ -105,6 +112,7 @@ podobnie właściwe bramki przed produkcją. Opisy innych operatorów nie stanow
 
 Wyłącznie127.0.0.1, jawna lista zasobów GET/HEAD, no-store i CSP connect-src none.
 Brak integracji MMS, danych klientów, zapisu w przeglądarce, bazy, telemetryki i publikacji.
-Nie utworzono repozytorium ani PR. Nie zmieniano Notion/GitHub.
+Repozytorium `multiplay-pages/korekty-fv` i GitHub Pages istnieją; lokalne poprawki
+formularza nie zostały jeszcze do nich wprowadzone. Nie zmieniano Notion.
 Kontynuację zaczynaj od nadrzędnego STAN_PROJEKTU.md i najnowszego raportu.
 
