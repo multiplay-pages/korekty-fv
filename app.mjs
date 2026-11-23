@@ -1,3 +1,4 @@
+Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 import { formatPln, formatDate, SERVICES } from './src/basket.mjs';
 import { evaluateDailyBasket, billingLabel, calculationSteps } from './src/daily-proration.mjs';
 import { buildSummary } from './src/summary.mjs';
@@ -34,6 +35,12 @@ function invalidate(message='Dane zmienione — oblicz ponownie, aby otrzymać a
   }
   for(const id of ['total-old','total-new','total-invoiced']) text(id,'—');
   datePreviews();
+}
+function correctionAction(delta) {
+  const amount=formatPln(delta.replace(/^-/,''));
+  if(delta.startsWith('-'))return {label:'Zwiększ fakturę o',amount,explanation:'Należność jest wyższa niż kwota na fakturze. Nie wystawiaj automatycznej dopłaty — wymaga weryfikacji.'};
+  if(delta==='0.00')return {label:'Faktura bez zmiany',amount,explanation:'Należność jest taka sama jak kwota na fakturze.'};
+  return {label:'Zmniejsz fakturę o',amount,explanation:'Należność po korekcie jest niższa niż kwota na fakturze.'};
 }
 function syncScenario() {
   document.querySelectorAll('[data-scenario]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.scenario===$('event-type').value)));
@@ -170,10 +177,11 @@ function render(result) {
   const r=result,g=r.global;
   renderInvoicePlan(result);
   text('total-old',formatPln(r.totals.old));text('total-new',formatPln(r.totals.new));text('total-invoiced',formatPln(r.totals.invoiced));
-  text('due',formatPln(g.due)); text('delta',formatPln(g.delta,true)); text('global-method',billingLabel(g.method));
+  const correction=correctionAction(g.delta);
+  text('due',formatPln(g.due)); text('delta-action',correction.label); text('delta',correction.amount); text('global-method',billingLabel(g.method));
   text('nominal-price',formatPln(r.totals.new));
   text('result-period',`${r.month.split('-').reverse().join('.')} · zmiana od ${formatDate(r.effectiveDate)}${r.lastOldDate?` · ostatni dzień usługi: ${formatDate(r.lastOldDate)}`:''}`);
-  text('delta-explanation',g.delta.startsWith('-')?'Dodatkowa należność do weryfikacji. Nie wystawiaj automatycznej dopłaty.':g.delta==='0.00'?'Brak różnicy łącznej względem faktury.':'Dodatnia różnica zmniejsza naliczenie na fakturze.');
+  text('delta-explanation',correction.explanation);
   text('method-explanation',g.method==='PARTIAL_DAYS_30'?'Ceny po rabatach × dni korzystania ÷ 30.':'Szczegóły naliczenia i daty poniżej.');
   text('days-month',g.daysInMonth);text('days-old',g.daysOld);text('days-new',g.daysNew);
   const steps=$('calculation-steps');steps.replaceChildren();
@@ -187,7 +195,7 @@ function render(result) {
   const body=$('line-results').tBodies[0];body.replaceChildren();
   for(const row of r.rows) {
     const tr=document.createElement('tr');
-    const values=[['Pozycja',`${row.label||`Pozycja ${row.number}`} · ${SERVICES[row.service]}`,'label'],['Sposób naliczenia',billingLabel(row.method),'method'],['Naliczono na fakturze',formatPln(row.invoiced),'invoiced'],['Należność — testowa',formatPln(row.due),'due'],['Zmniejszenie (+) / zwiększenie (−)',formatPln(row.delta,true),'delta']];
+    const values=[['Pozycja',`${row.label||`Pozycja ${row.number}`} · ${SERVICES[row.service]}`,'label'],['Sposób naliczenia',billingLabel(row.method),'method'],['Naliczono na fakturze',formatPln(row.invoiced),'invoiced'],['Należność — testowa',formatPln(row.due),'due'],['Różnica względem faktury',formatPln(row.delta,true),'delta']];
     for(const [label,value,key] of values) {const td=document.createElement('td');td.dataset.label=label;td.dataset.field=key;td.textContent=value;if(key==='label'&&row.description){const small=document.createElement('span');small.textContent=row.description;td.append(small);}tr.append(td);}
     body.append(tr);
   }
@@ -274,3 +282,4 @@ $('copy-summary').addEventListener('click',async()=>{
   }
 });
 addRow();
+

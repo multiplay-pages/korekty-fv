@@ -1,3 +1,4 @@
+Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 <!doctype html>
 <html lang="pl">
 <head>
@@ -55,12 +56,12 @@
       <p id="invoice-model-note" class="model-note"></p>
       <details class="invoice-rounding"><summary>Kontrola zgodności kwot i zaokrągleń</summary><p id="invoice-plan-control"></p></details>
     </div>
-    <div class="result-main"><div class="amount-main"><p>Należność za miesiąc</p><strong id="due">—</strong><span id="result-period"></span></div><div class="amount-delta"><p>Zmniejszenie (+) / zwiększenie (−) faktury</p><strong id="delta">—</strong><span id="delta-explanation"></span></div><div class="method-main"><p>Sposób naliczenia</p><strong id="global-method">—</strong><span id="method-explanation"></span></div></div>
+    <div class="result-main"><div class="amount-main"><p>Należność za miesiąc</p><strong id="due">—</strong><span id="result-period"></span></div><div class="amount-delta"><p id="delta-action">Co zrobić z fakturą</p><strong id="delta">—</strong><span id="delta-explanation"></span></div><div class="method-main"><p>Sposób naliczenia</p><strong id="global-method">—</strong><span id="method-explanation"></span></div></div>
     <div class="nominal-row"><span>Nowy abonament za pełny miesiąc</span><strong id="nominal-price"></strong><span>Różnica faktury nie jest kwotą zwrotu z wpłat.</span></div>
     <details class="method-details"><summary>Skąd te kwoty? Obliczenia krok po kroku</summary><div class="method-body"><dl class="days"><div><dt>Dni miesiąca</dt><dd id="days-month"></dd></div><div><dt>Dni przed zmianą</dt><dd id="days-old"></dd></div><div><dt>Dni od zmiany</dt><dd id="days-new"></dd></div></dl><div id="calculation-steps"></div><p id="formula-note" class="muted"></p></div></details>
     <details class="technical-rows"><summary>Szczegółowa kontrola pozycji koszyka</summary>
     <div class="proposal-heading"><h3>Kontrola należności usług</h3><p class="accounting-status">PROPOZYCJA TESTOWA — wymaga weryfikacji księgowej</p><p>Reszty groszowe pokazujemy jawnie, bez automatycznego przydzielania do wybranej usługi.</p></div>
-    <table id="line-results" class="result-table"><caption class="sr-only">Robocze należności i różnice pozycji</caption><thead><tr><th scope="col">Pozycja</th><th scope="col">Sposób naliczenia</th><th scope="col">Naliczono na fakturze</th><th scope="col">Należność — testowa</th><th scope="col">Zmniejszenie (+) / zwiększenie (−)</th></tr></thead><tbody></tbody></table>
+    <table id="line-results" class="result-table"><caption class="sr-only">Robocze należności i różnice pozycji</caption><thead><tr><th scope="col">Pozycja</th><th scope="col">Sposób naliczenia</th><th scope="col">Naliczono na fakturze</th><th scope="col">Należność — testowa</th><th scope="col">Różnica względem faktury</th></tr></thead><tbody></tbody></table>
     <div class="reconciliation"><div><span>Suma propozycji pozycji</span><strong id="row-sum"></strong></div><div><span>Reszta nieprzypisana <span class="muted">(koszyk − suma pozycji)</span></span><strong id="rounding-residual"></strong></div><p id="reconciliation-status"></p></div>
     </details>
     <div id="messages" class="messages" aria-label="Ostrzeżenia i kontrole"></div>
@@ -71,3 +72,4 @@
 <noscript>Włącz JavaScript, aby obliczać korekty lokalnie w przeglądarce.</noscript>
 </body>
 </html>
+

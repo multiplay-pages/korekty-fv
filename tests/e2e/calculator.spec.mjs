@@ -1,3 +1,4 @@
+Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 import { test as base, expect } from '@playwright/test';
 
 const APP_ORIGIN = 'http://127.0.0.1:4173';
@@ -66,6 +67,10 @@ function moneyPattern(amount, signed = false) {
 
 async function expectMoney(locator, amount, signed = false) {
   await expect(locator).toHaveText(new RegExp(`^\\s*${moneyPattern(amount, signed).source}\\s*$`));
+}
+
+async function expectCorrectionAmount(page, amount) {
+  await expectMoney(page.locator('#delta'), amount.replace(/^-/,''));
 }
 
 async function expectInvoiceSplit(page, index, amounts) {
@@ -198,7 +203,7 @@ test('calculates manually entered comma and dot amounts using the real form', as
   await fillManualCase(page, { old: '150,00', new: '100.00', invoiced: '130,00' });
   await calculateVerified(page);
   await expectMoney(page.locator('#due'), '128.33');
-  await expectMoney(page.locator('#delta'), '1.67', true);
+  await expectCorrectionAmount(page, '1.67');
   await expect(page.locator('#global-method')).toHaveText('Rzeczywiste dni ÷ 30');
   await expect(page.locator('#days-old')).toHaveText('17');
   await expect(page.locator('#days-new')).toHaveText('13');
@@ -223,14 +228,14 @@ test('invoice amount mirrors old monthly charge until its row override is enable
   await expect(positionField(page, 0, 'invoiced')).toHaveValue('140');
   await calculateVerified(page);
   await expectMoney(page.locator('#due'), '134.00');
-  await expectMoney(page.locator('#delta'), '6.00', true);
+  await expectCorrectionAmount(page, '6.00');
 
   await invoiceOverride(page, 0).uncheck();
   await expectNoResult(page);
   await expect(positionField(page, 0, 'invoiced')).toBeDisabled();
   await expect(positionField(page, 0, 'invoiced')).toHaveValue('160');
   await calculateVerified(page);
-  await expectMoney(page.locator('#delta'), '26.00', true);
+  await expectCorrectionAmount(page, '26.00');
 });
 
 test('invoice override only unlocks the amount belonging to its service row', async ({ page }) => {
@@ -281,7 +286,7 @@ for (const fixture of [
     await loadExample(page, fixture.id);
     await calculateVerified(page);
     await expectMoney(page.locator('#due'), fixture.due);
-    await expectMoney(page.locator('#delta'), fixture.delta, true);
+    await expectCorrectionAmount(page, fixture.delta);
     await expect(page.locator('#global-method')).toHaveText(fixture.method);
     for (const [index, selector] of ['#days-old', '#days-new', '#days-month'].entries()) {
       await expect(page.locator(selector)).toHaveText(String(fixture.days[index]));
@@ -301,7 +306,7 @@ test('two services use real calendar days and preserve the aggregate control', a
   await calculateVerified(page);
   await expect(page.locator('#global-method')).toHaveText('Rzeczywiste dni ÷ 30');
   await expectMoney(page.locator('#due'), '145.67');
-  await expectMoney(page.locator('#delta'), '4.33', true);
+  await expectCorrectionAmount(page, '4.33');
   await expectMoney(resultField(page, 0, 'due'), '84.67');
   await expectMoney(resultField(page, 1, 'due'), '61.00');
   await expectMoney(resultField(page, 0, 'delta'), '15.33', true);
@@ -324,7 +329,7 @@ test('T27 keeps the unchanged basket at full O despite changed components', asyn
   await calculateVerified(page);
   await expect(page.locator('#global-method')).toHaveText('Zmiana składników — do sprawdzenia');
   await expectMoney(page.locator('#due'), '150.00');
-  await expectMoney(page.locator('#delta'), '0.00');
+  await expectCorrectionAmount(page, '0.00');
   await expectMoney(resultField(page, 0, 'due'), '100.00');
   await expectMoney(resultField(page, 1, 'due'), '50.00');
   await expectMoney(resultField(page, 0, 'delta'), '0.00');
@@ -346,7 +351,7 @@ test('an upgrade on day one uses N while day two retains full O', async ({ page 
   await expect(page.locator('#date-hint')).toContainText('nowa od następnego miesiąca');
   await expect(page.locator('#global-method')).toHaveText('Pełny nowy abonament');
   await expectMoney(page.locator('#due'), '180.00');
-  await expectMoney(page.locator('#delta'), '-30.00', true);
+  await expectCorrectionAmount(page, '-30.00');
   await expectInvoiceSplit(page, 0, { 'old-charge': '0.00', 'new-charge': '180.00', 'period-residual': '0.00' });
   await expect(page.locator('#summary')).toHaveValue(/Pełny nowy abonament[^\n]+180,00 zł/);
 
@@ -355,7 +360,7 @@ test('an upgrade on day one uses N while day two retains full O', async ({ page 
   await calculateVerified(page);
   await expect(page.locator('#global-method')).toHaveText('Podwyżka od następnego miesiąca');
   await expectMoney(page.locator('#due'), '150.00');
-  await expectMoney(page.locator('#delta'), '0.00');
+  await expectCorrectionAmount(page, '0.00');
   await expectInvoiceSplit(page, 0, { 'old-charge': '150.00', 'new-charge': '0.00', 'period-residual': '0.00' });
   await expect(page.locator('#days-old')).toHaveText('1');
   await expect(page.locator('#days-new')).toHaveText('30');
@@ -436,7 +441,7 @@ test('rejects editable direction mismatches and fixes termination at zero', asyn
     await calculateVerified(page);
     await expect(page.locator('#global-method')).toHaveText('Rzeczywiste dni ÷ 30');
     await expectMoney(page.locator('#due'), '85.00');
-    await expectMoney(page.locator('#delta'), '65.00', true);
+    await expectCorrectionAmount(page, '65.00');
   });
 });
 
@@ -676,3 +681,4 @@ for (const viewport of [
     await page.screenshot({ path: testInfo.outputPath(`${browserName}-${project}-${viewport.name}-calculator.png`), fullPage: true });
   });
 }
+

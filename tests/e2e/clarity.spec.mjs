@@ -1,3 +1,4 @@
+Attempting to perform the InitializeDefaultDrives operation on the 'FileSystem' provider failed.
 import {test,expect} from '@playwright/test';
 
 test.beforeEach(async ({page})=>{await page.goto('/');});
@@ -46,6 +47,14 @@ test('wynik podaje kwotę z faktury i należność po korekcie',async({page})=>{
   await expect(page.locator('#residual-heading')).toBeHidden();
 });
 
+test('wynik podpowiada zmniejszenie faktury bez mylącego znaku plus',async({page})=>{
+  await page.locator('#example-select').selectOption('FEB_CHANGE');
+  await page.locator('#load-example').click();await page.locator('#calculate').click();
+  await expect(page.locator('#delta-action')).toHaveText('Zmniejsz fakturę o');
+  await expect(page.locator('#delta')).toHaveText('23,33 zł');
+  await expect(page.locator('.amount-delta')).not.toContainText('Zmniejszenie (+)');
+});
+
 test('zmiana usługi wymaga ponownego sprawdzenia kwoty faktury',async({page})=>{
   await page.locator('[data-field=old]').fill('100');
   await page.locator('[data-invoice-confirm]').check();
@@ -59,3 +68,4 @@ test('zmiana miesiąca wymaga ponownego sprawdzenia kwot faktury',async({page})=
   await page.locator('#month').fill('2027-03');
   await expect(page.locator('[data-invoice-confirm]')).not.toBeChecked();
 });
+
