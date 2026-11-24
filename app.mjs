@@ -8,6 +8,7 @@ const $=id=>document.getElementById(id);
 const form=$('calculator-form'),tbody=$('positions').tBodies[0];
 let nextRowId=1, revision=0;
 const text=(id,value)=>{$(id).textContent=value;};
+const validMonth=value=>/^\d{4}-(0[1-9]|1[0-2])$/.test(value);
 function nextDay(value) {
   if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return '';
   const [year,month,day]=value.split('-').map(Number);
@@ -18,7 +19,7 @@ function nextDay(value) {
   return `${String(nextYear).padStart(4,'0')}-${String(date.getUTCMonth()+1).padStart(2,'0')}-${String(date.getUTCDate()).padStart(2,'0')}`;
 }
 function datePreviews() {
-  text('month-preview',$('month').value?`Okres: ${$('month').value.split('-').reverse().join('.')}`:'');
+  text('month-preview',validMonth($('month').value)?`Wybrany okres: ${$('month').value.split('-').reverse().join('.')}`:'');
   text('date-preview',$('effective-date').value?`Data: ${formatDate($('effective-date').value)}`:'');
   text('end-date-preview',$('last-old-date').value?`Data: ${formatDate($('last-old-date').value)}`:'');
 }
@@ -96,7 +97,7 @@ function readForm() {
 }
 const errorCopy={
   DATE_NOT_VERIFIED:'Potwierdź, że skuteczna data została ustalona poza kalkulatorem.',
-  INVALID_MONTH:'Wybierz poprawny miesiąc rozliczeniowy.',INVALID_DATE:'Wpisz poprawną datę kalendarzową.',
+  INVALID_MONTH:'Wybierz miesiąc i rok rozliczeniowy w kalendarzu, np. 11.2026.',INVALID_DATE:'Wpisz poprawną datę kalendarzową.',
   INCONSISTENT_DATES:'Pierwszy dzień bez usługi musi przypadać po ostatnim dniu świadczenia. Sprawdź ostatni dzień usługi.',
   END_DATE_REQUIRED:'Wpisz ostatni dzień świadczenia usługi.',
   DIRECTION_MISMATCH:'Wybrany scenariusz nie odpowiada zmianie SUMY koszyka. Sprawdź stary i nowy abonament wszystkich pozycji.',
@@ -238,7 +239,7 @@ form.addEventListener('submit',event=>{
   event.preventDefault(); invalidate('Sprawdzam dane formularza.');
   try {
     const missing=[];
-    if(!$('month').value)missing.push(['Miesiąc rozliczeniowy',$('month')]);
+    if(!$('month').value)missing.push(['Miesiąc i rok rozliczeniowy',$('month')]);
     const termination=$('event-type').value==='WYPOWIEDZENIE';
     if(termination&&!$('last-old-date').value)missing.push(['Ostatni dzień usługi',$('last-old-date')]);
     if(!termination&&!$('effective-date').value)missing.push(['data zmiany',$('effective-date')]);
