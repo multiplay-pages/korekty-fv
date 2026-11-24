@@ -8,6 +8,10 @@ test('przykłady mają opisowe nazwy bez kodów testowych',async({page})=>{
   await expect(page.locator('#example-select')).toHaveValue('');
   await expect(page.locator('#load-example')).toBeDisabled();
 });
+test('miesiąc rozliczeniowy wyjaśnia, że trzeba wybrać też rok',async({page})=>{
+  await expect(page.locator('#month-hint')).toContainText('miesiąc i rok');
+  await expect(page.locator('#month-hint')).toContainText('11.2026');
+});
 test('przykład lutowy ma konkretne wyjaśnienie liczenia10+66,67',async({page},testInfo)=>{
   await page.locator('#example-select').selectOption('FEB_CHANGE');
   await page.locator('#load-example').click();await page.locator('#calculate').click();
@@ -19,6 +23,15 @@ test('przykład lutowy ma konkretne wyjaśnienie liczenia10+66,67',async({page},
   await expect(page.locator('.method-details')).not.toContainText(/Metoda [AB]|N \+|O \+/);
   await expect(page.locator('#summary')).toHaveValue(/Zmniejszenie faktury o 23,33 zł/);
   await page.screenshot({path:testInfo.outputPath('daily-explained.png'),fullPage:true});
+});
+test('wariant A/B wybiera niższą należność dla całego koszyka',async({page})=>{
+  await page.locator('#example-select').selectOption('FEB_CHANGE');
+  await page.locator('#load-example').click();
+  await page.locator('#calculation-ab-min').check();
+  await page.locator('#calculate').click();
+  await expect(page.locator('#due')).toHaveText(/82,00\s+zł/);
+  await expect(page.locator('#global-method')).toHaveText('Porównanie A/B — wybrano A');
+  await expect(page.locator('#method-explanation')).toContainText('niższą należność dla całego koszyka');
 });
 test('reset formularza usuwa także błędy i zmienione opcje rozliczenia',async({page})=>{
   await page.locator('#example-select').selectOption('T26');await page.locator('#load-example').click();
