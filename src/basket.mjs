@@ -1,6 +1,44 @@
 import { calculate } from './calculator.mjs';
 
-export const SERVICES = Object.freeze({ internet: 'Internet', tv: 'Telewizja', rental: 'Dzierżawa', other: 'Inny abonament' });
+// Etykiety miesięcznych pozycji z katalogów GigaNet, GigaBox i Biznes 3.1.
+export const SERVICE_GROUPS = {
+  'Internet i sieć': {
+    internet: 'Internet',
+    internetPlus: 'Internet+',
+    symmetric: 'Łącze symetryczne',
+    staticIp: 'Stały adres IP',
+    wifiMesh: 'WiFi Premium (MESH)',
+    lineMaintenance: 'Utrzymanie linii',
+  },
+  'Telewizja i dodatki': {
+    tv: 'Telewizja',
+    multiroom: 'Multiroom',
+    tvMax: 'TV MAX',
+    cplusSport: 'C+ Super Sport',
+    cplusFilms: 'C+ Seriale i Filmy',
+    pvrM: 'PVR M',
+    pvrL: 'PVR L',
+  },
+  'Telefon stacjonarny': {
+    phone60: 'Telefon 60 minut',
+    phone300: 'Telefon 300 minut',
+    phoneNoLimit: 'Telefon No-Limit / NoLimit Max',
+  },
+  'Bezpieczeństwo': {
+    securityPc1: 'Bitdefender Internet Security 1',
+    securityPc3: 'Bitdefender Internet Security 3',
+    securityMobile: 'Bitdefender Mobile Security',
+    securityFamily: 'Bitdefender Family Pack',
+    securityMac1: 'Bitdefender Antivirus for Mac 1',
+    securityMac3: 'Bitdefender Antivirus for Mac 3',
+  },
+  'Sprzęt i pozostałe': {
+    rental: 'Dzierżawa urządzeń',
+    routerRental: 'Dzierżawa routera',
+    other: 'Inny abonament',
+  },
+};
+export const SERVICES = Object.freeze(Object.assign({}, ...Object.values(SERVICE_GROUPS)));
 const FORM_FIELDS = new Set(['month','effectiveDate','lastOldDate','type','dateVerified','paid','multipleDates','unresolvedDiscounts','rows']);
 const ROW_FIELDS = new Set(['label','description','service','old','new','invoiced','basis','vat']);
 function fail(code, message, field) { throw Object.assign(new Error(message), { code, field }); }
@@ -80,3 +118,5 @@ export function formatPln(value, signed=false) {
   return `${sign}${whole.replace(/\B(?=(\d{3})+(?!\d))/g,' ' )},${part} zł`;
 }
 export function formatDate(value) { return value?value.split('-').reverse().join('.'):''; }
+
+export { cents as parseAmount, amount as formatAmount };

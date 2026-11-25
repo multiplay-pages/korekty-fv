@@ -4,77 +4,137 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <title>Kalkulator korekt 1/30 · Multiplay BOK</title>
+  <title>Kalkulator korekty abonamentu · Multiplay BOK/SUD</title>
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
   <link rel="stylesheet" href="./styles.css">
   <script type="module" src="./app.mjs"></script>
 </head>
 <body>
 <a class="skip-link" href="#calculator-form">Przejdź do formularza</a>
-<header class="topbar"><div class="topbar-inner"><a class="brand" href="/" aria-label="Multiplay BOK — początek"><span class="brand-mark" aria-hidden="true">m</span><span>multiplay<span class="brand-divider">/</span><strong>BOK</strong></span></a><span class="environment">Środowisko lokalne <span aria-hidden="true">·</span> Etap 2</span></div></header>
+<header class="topbar">
+  <div>
+    <a class="brand" href="./" aria-label="Multiplay BOK/SUD — początek">Multiplay <span>· BOK/SUD</span></a>
+    <h1>Kalkulator korekty abonamentu</h1>
+  </div>
+  <span class="environment">Wersja testowa · TEST_ONLY</span>
+</header>
 <main>
-  <div class="page-heading"><div><p class="eyebrow">MULTIPLAY · NARZĘDZIA BOK</p><h1>Korekta abonamentu<br><span>bez ręcznego liczenia.</span></h1><p class="intro">Wybierz zmianę, wpisz ceny i zobacz, jak przygotować pozycje korekty.</p></div><div class="hero-visual" aria-hidden="true"><span class="hero-visual-label">MIESIĄC ROZLICZENIOWY</span><strong>1<span>/</span>30</strong><div class="hero-visual-line"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small>Stary abonament&nbsp; → &nbsp;nowy abonament</small></div><span class="badge">Wersja testowa</span></div>
-  <div class="scope-note"><strong>Prototyp do testów.</strong> Wprowadzaj wyłącznie dane syntetyczne. Podstawa umowna, VAT, księgowanie i zaokrąglenia wymagają zatwierdzenia.</div>
-  <form id="calculator-form" novalidate autocomplete="off">
-    <div id="errors" class="error-box" role="alert" tabindex="-1" hidden></div>
-    <section class="sheet calculation-choice" aria-labelledby="calculation-heading">
-      <div class="section-heading"><h2 id="calculation-heading"><span class="step">01</span> Wariant obliczeń</h2><span class="section-hint">Wybierz przed wpisaniem danych</span></div>
-      <p class="section-copy">Oba warianty są robocze i wymagają kontroli księgowej. Zmiana wariantu zmienia wyłącznie sposób wyliczenia korekty.</p>
-      <div class="calculation-cards" role="radiogroup" aria-label="Wariant obliczeń korekty">
-        <label class="calculation-card"><input id="calculation-actual-days" type="radio" name="calculation-mode" value="ACTUAL_DAYS" checked><span><strong>Rzeczywiste dni ÷ 30</strong><small>Obecny wariant: cena każdej części miesiąca × faktyczne dni korzystania ÷ 30.</small></span></label>
-        <label class="calculation-card"><input id="calculation-ab-min" type="radio" name="calculation-mode" value="AB_MIN"><span><strong>Porównanie A/B — niższa należność</strong><small>Wariant wcześniejszy: porównuje dwa sposoby dla całego koszyka i wybiera niższą kwotę.</small></span></label>
-      </div>
-    </section>
-    <section class="sheet" aria-labelledby="event-heading">
-      <div class="section-heading"><h2 id="event-heading"><span class="step">02</span> Zdarzenie i okres</h2><span class="section-hint">Jedna wspólna data dla całego koszyka</span></div>
-      <div class="scenario-intro"><h3>Co się zmienia?</h3><p>Wybierz sytuację, którą chcesz rozliczyć.</p></div>
-      <div class="scenario-cards" role="group" aria-label="Rodzaj zmiany abonamentu">
-        <button type="button" class="scenario-card" data-scenario="DOWNGRADE" aria-pressed="true"><span class="scenario-icon" aria-hidden="true">↘</span><span><strong>Obniżenie</strong><small>Nowy abonament jest niższy</small></span></button>
-        <button type="button" class="scenario-card" data-scenario="PODWYŻKA" aria-pressed="false"><span class="scenario-icon" aria-hidden="true">↗</span><span><strong>Zwiększenie</strong><small>Nowy abonament jest wyższy</small></span></button>
-        <button type="button" class="scenario-card" data-scenario="WYPOWIEDZENIE" aria-pressed="false"><span class="scenario-icon" aria-hidden="true">■</span><span><strong>Zakończenie</strong><small>Usługa przestaje być świadczona</small></span></button>
-        <button type="button" class="scenario-card" data-scenario="NO_CHANGE" aria-pressed="false"><span class="scenario-icon" aria-hidden="true">＝</span><span><strong>Bez zmiany sumy</strong><small>Kontrola pozycji abonamentu</small></span></button>
-      </div>
+  <p class="scope-note">Wprowadzaj wyłącznie dane syntetyczne.</p>
+  <div class="workspace">
+    <form id="calculator-form" novalidate autocomplete="off">
+      <section class="sheet" aria-labelledby="event-heading">
+        <div class="section-heading"><span class="step-badge" aria-hidden="true">1</span><h2 id="event-heading">Zmiana abonamentu</h2><span class="section-hint">Kwoty brutto po rabatach</span></div>
       <div class="event-grid">
-        <div class="sr-only" aria-hidden="true"><label for="event-type">Co zmieniasz?</label><select id="event-type" tabindex="-1"><option value="DOWNGRADE">Przedłużenie — obniżenie abonamentu</option><option value="WYPOWIEDZENIE">Zakończenie usługi</option><option value="PODWYŻKA">Przedłużenie — zwiększenie abonamentu</option><option value="NO_CHANGE">Brak zmiany łącznej ceny / kontrola</option></select></div>
-        <div class="field"><label for="month">Miesiąc rozliczeniowy <span class="required-note">— wymagane</span></label><input id="month" type="month" required min="0001-01" max="9999-12" aria-describedby="month-hint month-preview"><small id="month-hint">Wybierz miesiąc i rok z kalendarza, np. 11.2026. Sam numer miesiąca nie wystarczy.</small><small id="month-preview"></small></div>
-        <div class="field" id="end-date-field" hidden><label for="last-old-date">Ostatni dzień usługi <span class="required-note">— wymagane</span></label><input id="last-old-date" type="date" min="0001-01-01" max="9999-12-31"><small>Wpisz ostatni dzień świadczenia. Następny dzień obliczymy automatycznie. <span id="end-date-preview"></span></small></div>
-        <div class="field"><label for="effective-date"><span id="effective-label">Od kiedy obowiązuje nowy abonament?</span> <span id="effective-required" class="required-note">— wymagane</span></label><input id="effective-date" type="date" required min="0001-01-01" max="9999-12-31"><small><span id="date-hint">Nowe warunki obowiązują od tego dnia włącznie.</span> <span id="date-preview"></span></small></div>
+        <div class="field">
+          <label for="last-old-date">Ostatni dzień starych warunków</label>
+          <input id="last-old-date" type="date" required min="0001-01-01" max="9999-12-31" aria-describedby="date-hint date-preview">
+          <small id="date-hint">Podaj datę włącznie. Zmiana zaczyna się następnego dnia.</small>
+          <small id="date-preview" aria-live="polite"></small>
+        </div>
+        <div class="field"><label for="month">Miesiąc rozliczeniowy</label><input id="month" type="month" required min="0001-01" max="9999-12" aria-describedby="month-hint month-preview"><small id="month-hint">Wybierz miesiąc i rok, np. listopad 2026.</small><small id="month-preview" aria-live="polite"></small><button id="restore-month" class="missing-link" type="button" hidden></button></div>
       </div>
-      <p class="date-note">Wpisz uzgodnioną datę zmiany lub zakończenia usługi. Kalkulator wylicza kwoty na jej podstawie.</p>
-    </section>
-    <section class="sheet" aria-labelledby="positions-heading">
-      <div class="section-heading"><h2 id="positions-heading"><span class="step">03</span> Ceny abonamentu</h2><span class="section-hint">Pełne ceny miesięczne brutto po rabatach · zł/mies.</span></div>
-      <p class="section-copy">Wpisz pełne abonamenty miesięczne brutto po rabatach. Dla każdej usługi sprawdź kwotę na fakturze i potwierdź ją poniżej. Uwzględniaj tylko opłaty cykliczne.</p>
-      <div id="termination-note" class="inline-note" hidden>Kończysz cały analizowany zakres — nowy abonament każdej pozycji wynosi 0,00 zł.</div>
-      <table id="positions" class="entry-table simplified"><caption class="sr-only">Pełne miesięczne ceny abonamentu i kwoty już naliczone na fakturze</caption><thead><tr><th scope="col">Usługa</th><th scope="col">Dotychczasowy abonament<span class="subhead">pełny miesiąc</span></th><th scope="col">Nowy abonament<span class="subhead">pełny miesiąc</span></th><th scope="col">Już naliczono na fakturze</th><th scope="col">Szczegóły</th><th scope="col"><span class="sr-only">Usuń pozycję</span></th></tr></thead><tbody></tbody><tfoot><tr><th scope="row">Razem</th><td id="total-old">—</td><td id="total-new">—</td><td id="total-invoiced">—</td><td colspan="2">Kwoty brutto</td></tr></tfoot></table>
-      <div class="table-actions"><button id="add-position" class="button secondary" type="button"><span aria-hidden="true">＋</span> Dodaj pozycję</button><span id="row-count" class="muted">1 pozycja</span></div>
-      <details class="complexity"><summary>Przypadek złożony — sprawdź przed obliczeniem</summary><div class="complexity-options"><label class="check-line"><input id="multiple-dates" type="checkbox"><span>W koszyku jest więcej niż jedna niezależna data zmiany.</span></label><label class="check-line"><input id="unresolved-discounts" type="checkbox"><span>Występują nieuzgodnione rabaty lub znaki pozycji rabatowych.</span></label><p>Takie przypadki oraz różne kategorie VAT wymagają odrębnej kontroli. Prototyp blokuje ich łączne rozliczenie.</p></div></details>
-    </section>
-    <div class="action-bar"><button id="calculate" class="button primary" type="submit">Oblicz korektę <span aria-hidden="true">→</span></button><button id="reset" class="button quiet" type="button">Resetuj wszystko</button><div class="example-actions"><label for="example-select" class="sr-only">Przykład do sprawdzenia</label><select id="example-select"><option value="">Wybierz przykład</option><option value="FEB_CHANGE">Luty: 100 → 80 zł od 4 lutego</option><option value="T26">Internet i telewizja — zmiana pakietu</option><option value="T27">Zmiana usług przy tej samej cenie łącznej</option><option value="T08">Zakończenie po 1 dniu usługi</option><option value="T01">Obniżka w lutym — 28 dni</option><option value="T02">Obniżka w lutym przestępnym — 29 dni</option><option value="T03">Obniżka w listopadzie — 30 dni</option><option value="T18">Podwyżka od początku miesiąca</option></select><button id="load-example" class="button secondary" type="button" disabled>Wczytaj przykład</button></div></div>
-    <p id="form-feedback" class="feedback" role="status">Zacznij od danych lub wczytaj przykład testowy.</p>
-  </form>
-  <section id="results" class="results" aria-labelledby="result-heading" hidden>
-    <div class="result-heading"><h2 id="result-heading" tabindex="-1"><span class="step">04</span> Jak przygotować korektę</h2><div class="result-actions"><span class="badge">Kwoty robocze</span><button id="reset-result" class="button secondary" type="button">Nowe obliczenie — resetuj wszystko</button></div></div>
-    <div id="invoice-plan" class="invoice-plan" hidden>
-      <p id="invoice-plan-status" class="message info"></p>
-      <p id="invoice-comparison" class="invoice-comparison"></p>
-      <table class="invoice-table"><caption class="sr-only">Stary abonament po korekcie i nowa część do dodania</caption><thead><tr><th scope="col">Usługa</th><th scope="col">Stary abonament<br>po korekcie</th><th scope="col">Nowy abonament<br>do dodania</th><th scope="col">Razem części</th><th id="residual-heading" scope="col">Reszta do uzgodnienia</th></tr></thead><tbody></tbody></table>
-      <div class="invoice-total"><span>Razem stary i nowy abonament</span><strong id="invoice-parts-total"></strong></div>
-      <p id="invoice-model-note" class="model-note"></p>
-      <details class="invoice-rounding"><summary>Kontrola zgodności kwot i zaokrągleń</summary><p id="invoice-plan-control"></p></details>
-    </div>
-    <div class="result-main"><div class="amount-main"><p>Należność za miesiąc</p><strong id="due">—</strong><span id="result-period"></span></div><div class="amount-delta"><p id="delta-action">Co zrobić z fakturą</p><strong id="delta">—</strong><span id="delta-explanation"></span></div><div class="method-main"><p>Sposób naliczenia</p><strong id="global-method">—</strong><span id="method-explanation"></span></div></div>
-    <div class="nominal-row"><span>Nowy abonament za pełny miesiąc</span><strong id="nominal-price"></strong><span>Różnica faktury nie jest kwotą zwrotu z wpłat.</span></div>
-    <details class="method-details"><summary>Skąd te kwoty? Obliczenia krok po kroku</summary><div class="method-body"><dl class="days"><div><dt>Dni miesiąca</dt><dd id="days-month"></dd></div><div><dt>Dni przed zmianą</dt><dd id="days-old"></dd></div><div><dt>Dni od zmiany</dt><dd id="days-new"></dd></div></dl><div id="calculation-steps"></div><p id="formula-note" class="muted"></p></div></details>
-    <details class="technical-rows"><summary>Szczegółowa kontrola pozycji koszyka</summary>
-    <div class="proposal-heading"><h3>Kontrola należności usług</h3><p class="accounting-status">PROPOZYCJA TESTOWA — wymaga weryfikacji księgowej</p><p>Reszty groszowe pokazujemy jawnie, bez automatycznego przydzielania do wybranej usługi.</p></div>
-    <table id="line-results" class="result-table"><caption class="sr-only">Robocze należności i różnice pozycji</caption><thead><tr><th scope="col">Pozycja</th><th scope="col">Sposób naliczenia</th><th scope="col">Naliczono na fakturze</th><th scope="col">Należność — testowa</th><th scope="col">Różnica względem faktury</th></tr></thead><tbody></tbody></table>
-    <div class="reconciliation"><div><span>Suma propozycji pozycji</span><strong id="row-sum"></strong></div><div><span>Reszta nieprzypisana <span class="muted">(koszyk − suma pozycji)</span></span><strong id="rounding-residual"></strong></div><p id="reconciliation-status"></p></div>
-    </details>
-    <div id="messages" class="messages" aria-label="Ostrzeżenia i kontrole"></div>
-  </section>
-  <section class="summary-section" aria-labelledby="summary-heading"><div class="section-heading"><div><h2 id="summary-heading">Podsumowanie korekty do skopiowania</h2><p class="section-copy">Kwoty starego i nowego abonamentu, daty i kontrole. Bez danych klienta.</p></div><button id="copy-summary" class="button secondary" type="button" disabled>Kopiuj robocze podsumowanie</button></div><label class="sr-only" for="summary">Treść roboczego podsumowania</label><textarea id="summary" rows="6" readonly placeholder="Podsumowanie pojawi się po poprawnym obliczeniu."></textarea><p id="copy-feedback" role="status" class="feedback"></p></section>
-  <footer><span>Reguła 0.2.0 · Wariant: rzeczywiste dni ÷ 30 albo A/B dla całego koszyka · 13.11.2026</span><span>Wersja testowa · Wymaga akceptacji przed użyciem produkcyjnym</span></footer>
+      <div id="aggregate-values" class="basket-fields">
+        <p id="declared-note" hidden>Wpisane ceny służą do porównania z pozycjami. Wpisana kwota faktury również będzie porównana.</p>
+        <div class="basket-grid basket-price-grid">
+          <div class="field"><label for="basket-old">Dotychczasowy abonament brutto</label><input id="basket-old" type="text" inputmode="decimal" maxlength="64" placeholder="np. 150,00 zł" required></div>
+          <div class="field"><label for="basket-new">Nowy abonament brutto</label><input id="basket-new" type="text" inputmode="decimal" maxlength="64" placeholder="np. 120,00 zł" required><small>Wpisz 0,00 zł, jeśli po zmianie opłata wynosi zero.</small></div>
+        </div>
+      </div>
+      <div id="invoice-details" class="basket-fields invoice-fields">
+        <fieldset id="document-state"><legend>Faktura za analizowany miesiąc</legend><div class="invoice-options">
+          <label class="invoice-option"><input type="radio" name="document-state" value="UNKNOWN" checked><span class="invoice-card">Nie wiem</span></label>
+          <label class="invoice-option"><input type="radio" name="document-state" value="AMOUNT"><span class="invoice-card">Wpisz kwotę</span></label>
+          <label class="invoice-option"><input type="radio" name="document-state" value="NOT_ISSUED"><span class="invoice-card">Nie wystawiono</span></label>
+        </div></fieldset>
+        <div class="field" id="aggregate-invoice-field"><label for="basket-invoiced">Kwota abonamentu na fakturze brutto</label><input id="basket-invoiced" type="text" inputmode="decimal" maxlength="64" placeholder="np. 150,00 zł"></div>
+      </div>
+      <div id="derived-overview" class="basket-fields" hidden>
+        <p>Kwoty z pozycji BOK</p>
+        <dl class="basket-grid derived-grid">
+          <div><dt>Dotychczasowy abonament brutto</dt><dd data-basket-total="old">—</dd></div>
+          <div><dt>Nowy abonament brutto</dt><dd data-basket-total="new">—</dd></div>
+          <div><dt>Kwota faktury brutto</dt><dd data-basket-total="invoiced">—</dd></div>
+        </dl>
+        <button id="toggle-declared" class="button quiet" type="button" aria-controls="aggregate-values" aria-expanded="false">Pokaż sumy wpisane do porównania</button>
+      </div>
+      </section>
+      <details id="bok-details" class="sheet bok-details">
+        <summary class="step-summary"><span class="step-badge" aria-hidden="true">2</span><span class="step-title">Pozycje faktury — BOK</span></summary>
+        <div class="bok-controls">
+          <label class="check-line"><input id="use-lines" type="checkbox"><span>Oblicz na podstawie pozycji</span></label>
+          <p id="source-status" class="muted" role="status">Źródło kalkulacji: kwoty całego koszyka.</p>
+        </div>
+        <div id="position-editor" hidden>
+          <table id="positions" class="entry-table simplified"><caption class="sr-only">Pełne miesięczne ceny abonamentu i kwoty faktury</caption><thead><tr><th scope="col">Pozycja / usługa</th><th scope="col">Stary abonament<span class="subhead">pełny miesiąc</span></th><th scope="col">Nowy abonament</th><th scope="col">Na fakturze</th><th scope="col">Szczegóły</th><th scope="col"><span class="sr-only">Usuń pozycję</span></th></tr></thead><tbody></tbody><tfoot><tr><th scope="row">Suma brutto pozycji</th><td id="total-old" data-basket-total="old">—</td><td id="total-new" data-basket-total="new">—</td><td id="total-invoiced" data-basket-total="invoiced">—</td><td colspan="2">Podstawa każdej pozycji musi być brutto</td></tr></tfoot></table>
+          <div class="table-actions"><button id="add-position" class="button secondary" type="button">Dodaj pozycję</button><span id="row-count" class="muted">0 pozycji</span></div>
+          <div class="confirmation-controls">
+            <div class="field"><label for="basket-vat">Stawka VAT koszyka</label><select id="basket-vat"><option value="">Wybierz</option><option value="23">23%</option><option value="8">8%</option><option value="5">5%</option><option value="0">0%</option><option value="zw">Zwolniony</option></select></div>
+            <label class="check-line"><input id="invoice-confirmed" type="checkbox" aria-describedby="confirmation-hint" disabled><span id="confirm-label">Kwoty „Na fakturze” sprawdziłem w MMS.</span></label>
+            <small id="confirmation-hint" aria-live="polite"></small>
+          </div>
+        </div>
+      </details>
+      <details class="sheet complexity"><summary class="step-summary"><span class="step-badge" aria-hidden="true">3</span><span class="step-title">Sprawa nietypowa</span></summary>
+        <div class="complexity-options">
+          <p class="muted">Zaznacz wątpliwości do sprawdzenia przed obliczeniem, w tym dotyczące daty z dokumentów lub uzgodnienia.</p>
+          <div class="field"><label for="billing-scope">Zakres sprawy</label><select id="billing-scope"><option value="B2C">B2C, kwoty brutto</option><option value="B2B">B2B / Biznes 3.1</option><option value="OTHER">Inny zakres</option></select></div>
+          <label class="check-line"><input id="multiple-dates" type="checkbox"><span>W koszyku jest więcej niż jedna niezależna data zmiany.</span></label>
+          <label class="check-line"><input id="unresolved-discounts" type="checkbox"><span>Rabaty lub ich znaki wymagają uzgodnienia.</span></label>
+          <label class="check-line"><input id="non-comparable" type="checkbox"><span>Zakres na fakturze i w koszyku nie jest porównywalny.</span></label>
+          <label class="check-line"><input id="components-changed" type="checkbox"><span>Pozycje się zmieniły, a łączna cena pozostała taka sama.</span></label>
+          <label class="check-line"><input id="date-uncertain" type="checkbox"><span>Skuteczna data wymaga potwierdzenia.</span></label>
+        </div>
+      </details>
+      <div class="action-bar">
+        <button id="calculate" class="button primary" type="submit">Oblicz korektę <span aria-hidden="true">→</span></button>
+        <label class="check-line"><input id="training-mode" type="checkbox" aria-controls="training-examples"><span>Przykłady szkoleniowe</span></label>
+        <div id="training-examples" class="example-actions" hidden>
+          <div class="field"><label for="example-select">Przykład szkoleniowy</label><select id="example-select"><option value="">Wybierz przykład</option><option value="FEB_CHANGE">Luty: 100 → 80 zł od 4 lutego</option><option value="T26">Internet i telewizja — zmiana pakietu</option><option value="T27">Zmiana usług przy tej samej cenie łącznej</option><option value="T08">Zakończenie po 1 dniu usługi</option><option value="T01">Obniżka w lutym — 28 dni</option><option value="T02">Obniżka w lutym przestępnym — 29 dni</option><option value="T03">Obniżka w listopadzie — 30 dni</option><option value="T18">Podwyżka od początku miesiąca</option><option value="UPGRADE_LATER">Podwyżka w trakcie miesiąca</option><option value="INVOICE_DIFFERS">Faktura wyższa od dotychczasowego abonamentu</option><option value="VAT_REVIEW">Koszyk z różnymi kategoriami VAT</option></select></div>
+          <button id="load-example" class="button secondary" type="button" disabled>Wczytaj przykład</button>
+        </div>
+      </div>
+      <p id="form-feedback" class="feedback" role="status"></p>
+    </form>
+    <aside class="result-panel" aria-labelledby="panel-heading">
+      <div class="result-toolbar"><p id="panel-heading">Wynik korekty</p><button id="reset" class="button secondary" type="button">Nowa sprawa</button></div>
+      <p id="result-empty" class="muted">Wynik pojawi się po obliczeniu.</p>
+      <div id="errors" class="error-box" role="alert" tabindex="-1" hidden></div>
+      <section id="results" class="results" aria-labelledby="result-heading" hidden>
+        <div class="result-heading"><span id="result-pill" class="result-pill" aria-hidden="true"></span><h2 id="result-heading" tabindex="-1"></h2></div>
+        <div id="decision-feedback" class="decision-feedback" role="status">
+          <p id="result-period"></p>
+          <p id="delta-explanation"></p>
+          <p id="invoiced-source"></p>
+          <p id="result-main-amount" hidden><strong id="delta"></strong> — zmniejszenie</p>
+        </div>
+        <dl id="result-fields" class="nominal-row" hidden></dl>
+        <div class="result-actions" id="result-actions">
+          <button id="copy-summary" class="button secondary" type="button" disabled>Kopiuj podsumowanie poglądowe</button>
+          <p id="copy-scope" class="section-copy"></p>
+          <p id="copy-feedback" role="status" class="feedback"></p>
+        </div>
+        <p id="client-note" class="section-copy"></p>
+        <ul id="document-variants" class="document-variants" hidden></ul>
+        <details id="calculation-details" class="method-details" hidden><summary>Jak policzono</summary><div class="method-body"><h3 id="global-method"></h3><p id="method-explanation"></p><p id="calculation-steps" class="calculation-step"></p><dl class="days"><div><dt>Dni miesiąca</dt><dd id="days-month"></dd></div><div><dt>Dni starej ceny</dt><dd id="days-old"></dd></div><div><dt>Dni nowej ceny</dt><dd id="days-new"></dd></div></dl><p id="formula-note" class="muted"></p><div id="calculation-parts"></div></div></details>
+        <section id="bok-result" aria-labelledby="bok-result-heading" hidden>
+          <h3 id="bok-result-heading">Rozbicie poglądowe — BOK</h3>
+          <div class="technical-rows">
+            <table id="line-results" class="result-table"><caption class="sr-only">Należności i różnice pozycji, poglądowo</caption><thead><tr><th scope="col">Pozycja</th><th scope="col">Na fakturze</th><th scope="col">Należność</th><th scope="col">Różnica (poglądowo)</th></tr></thead><tbody></tbody><tfoot><tr id="remainder-row" hidden><td id="rounding-residual" colspan="4"></td></tr></tfoot></table>
+          </div>
+        </section>
+        <details id="copy-preview">
+          <summary>Podgląd podsumowania do skopiowania</summary>
+          <label class="sr-only" for="summary">Treść poglądowego podsumowania</label>
+          <textarea id="summary" rows="6" readonly></textarea>
+        </details>
+      </section>
+      <div id="messages" class="messages" aria-label="Ostrzeżenia i kontrole">
+        <p class="message">Kwoty robocze · D05 · D11 — weryfikacja umowna i księgowa.</p>
+        <details id="warning-details" hidden><summary>Ostrzeżenia dotyczące sprawy</summary><ul id="scenario-warnings"></ul></details>
+      </div>
+    </aside>
+  </div>
+  <footer><span>© Multiplay • Kalkulator korekty abonamentu • BOK/SUD</span><span>Wersja <span id="policy-version"></span> · Aktualizacja <time datetime="2026-11-25">25.11.2026</time></span></footer>
 </main>
 <noscript>Włącz JavaScript, aby obliczać korekty lokalnie w przeglądarce.</noscript>
 </body>

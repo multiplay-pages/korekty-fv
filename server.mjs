@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 const routes=new Map([
   ['/',['index.html','text/html; charset=utf-8']],['/index.html',['index.html','text/html; charset=utf-8']],
   ['/styles.css',['styles.css','text/css; charset=utf-8']],['/app.mjs',['app.mjs','text/javascript; charset=utf-8']],
-  ...['calculator','basket','summary','examples','invoice-plan','daily-proration'].map(name=>[`/src/${name}.mjs`,[`src/${name}.mjs`,'text/javascript; charset=utf-8']]),
+  ...['calculator','basket','summary','examples','invoice-plan','daily-proration','billing-policy'].map(name=>[`/src/${name}.mjs`,[`src/${name}.mjs`,'text/javascript; charset=utf-8']]),
   ['/favicon.svg',['favicon.svg','image/svg+xml']],
 ]);
 export function createLocalServer() {
@@ -31,8 +31,17 @@ export function createLocalServer() {
   });
   return server;
 }
-if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)) {
-  const server=createLocalServer();
-  server.on('error',error=>{console.error(error.code==='EADDRINUSE'?'Port 4173 jest zajęty. Zamknij poprzednie uruchomienie lub sprawdź działającą aplikację.':error.message);process.exitCode=1;});
-  server.listen(4173,'127.0.0.1',()=>console.log('Multiplay BOK — lokalny prototyp: http://127.0.0.1:4173 (Ctrl+C kończy pracę).'));
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const port = Number(process.env.BOK_PORT ?? 4173);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    console.error('BOK_PORT musi być liczbą od 1 do 65535.');
+    process.exit(1);
+  }
+  const server = createLocalServer();
+  server.on('error', error => {
+    console.error(error.code === 'EADDRINUSE'
+      ? `Port ${port} jest niedostępny. Sprawdź istniejący serwer lub ustaw inny BOK_PORT.` : error.message);
+    process.exitCode = 1;
+  });
+  server.listen(port, '127.0.0.1', () => console.log(`Multiplay BOK/SUD: http://127.0.0.1:${port}/ (Ctrl+C kończy pracę).`));
 }

@@ -1,286 +1,588 @@
-import { evaluateBasket, formatPln, formatDate, SERVICES } from './src/basket.mjs';
-import { evaluateDailyBasket, billingLabel, calculationSteps } from './src/daily-proration.mjs';
-import { buildSummary } from './src/summary.mjs';
+import { formatPln, formatDate, SERVICE_GROUPS } from './src/basket.mjs';
+import { ACTIVE_DEMO_POLICY, evaluateCorrection, nextCalendarDay, summarizeGrossRows } from './src/billing-policy.mjs';
+import { buildResultPresentation, copyResultPresentation } from './src/summary.mjs';
 import { example } from './src/examples.mjs';
-import { buildInvoicePlan } from './src/invoice-plan.mjs';
 
 const $=id=>document.getElementById(id);
 const form=$('calculator-form'),tbody=$('positions').tBodies[0];
 let nextRowId=1, revision=0;
 const text=(id,value)=>{$(id).textContent=value;};
 const validMonth=value=>/^\d{4}-(0[1-9]|1[0-2])$/.test(value);
-function nextDay(value) {
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return '';
-  const [year,month,day]=value.split('-').map(Number);
-  const date=new Date(0);date.setUTCHours(0,0,0,0);date.setUTCFullYear(year,month-1,day);
-  if(date.getUTCFullYear()!==year||date.getUTCMonth()!==month-1||date.getUTCDate()!==day)return '';
-  date.setUTCDate(date.getUTCDate()+1);
-  const nextYear=date.getUTCFullYear();if(nextYear>9999)return '';
-  return `${String(nextYear).padStart(4,'0')}-${String(date.getUTCMonth()+1).padStart(2,'0')}-${String(date.getUTCDate()).padStart(2,'0')}`;
+const formatPeriod = value => value.split('-').reverse().join('.');
+const moneyFields = ['old', 'new', 'invoiced'];
+const polishMonth = new Intl.DateTimeFormat('pl-PL', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+const currencyInput = /^(\d{1,15}|\d{1,3}([ \u00a0\u202f])\d{3}(?:\2\d{3})*)([.,]\d{1,2})?(?:[ \u00a0\u202f]?zł)?$/u;
+const clientNotes = {
+  CORRECTION: 'Zmiana abonamentu może wpłynąć na opłatę za wskazany miesiąc.',
+  CONFIRMED: 'Po zmianie abonamentu przewidujemy zmniejszenie opłaty za wskazany miesiąc.',
+  NO_CORRECTION: 'Opłata za wskazany okres pozostaje bez zmian.',
+  NO_CORRECTION_EXPECTED: 'Za ten miesiąc nie przewidujemy korekty abonamentu.',
+  NOT_APPLICABLE: 'Korekta nie dotyczy wskazanego miesiąca i faktury.',
+  INVOICE_REQUIRED: 'Aby ustalić wynik, potrzebujemy kwoty abonamentu z faktury.',
+  REVIEW: 'Szczegóły opłaty wymagają sprawdzenia.',
+  REFER: 'Sprawę sprawdzi zespół rozliczeń.',
+  ERROR: 'Do sprawdzenia opłaty potrzebne są poprawne dane.',
+};
+
+function normalizeMoney(input) {
+  const value = input.trim();
+  const match = currencyInput.exec(value);
+  if (!value) return '';
+  // Null represents an invalid entry; the resolver keeps its validation order and field errors.
+  if (!match) return null;
+  const integer = match[1].replace(/[ \u00a0\u202f]/gu, '');
+  return integer.length <= 15 ? integer + (match[3] ?? '') : null;
 }
+
+function documentStateControl() {
+  return form.querySelector('input[name="document-state"]:checked');
+}
+
+function setDocumentState(value) {
+  form.querySelector('input[name="document-state"][value="' + value + '"]').checked = true;
+}
+
+function resultPill(label, tone) {
+  const pill = document.createElement('span');
+  pill.className = 'result-pill';
+  pill.setAttribute('aria-hidden', 'true');
+  pill.dataset.tone = tone;
+  pill.textContent = label;
+  return pill;
+}
+
+function clientNote(decision) {
+  return 'Dla klienta: ' + clientNotes[decision];
+}
+const serviceOptions = Object.entries(SERVICE_GROUPS).map(([group, services]) => {
+  const options = Object.entries(services).map(([key, label]) => `<option value="${key}">${label}</option>`).join('');
+  return `<optgroup label="${group}">${options}</optgroup>`;
+}).join('');
+const problemFlags = ['multiple-dates', 'unresolved-discounts', 'non-comparable', 'components-changed', 'date-uncertain'];
+let comparingTotals = false;
+let monthEdited = false, aggregateDocumentState = 'UNKNOWN', linesDocumentState = 'UNKNOWN';
+
+function readRows() {
+  return Array.from(tbody.rows, tr => ({
+    id: tr.dataset.rowId,
+    ...Object.fromEntries(Array.from(tr.querySelectorAll('[data-field]'), el => [el.dataset.field, moneyFields.includes(el.dataset.field) ? normalizeMoney(el.value) : el.value.trim()])),
+  }));
+}
+
+function updateGrossSums() {
+  const sums = summarizeGrossRows(readRows());
+  if (documentStateControl().value !== 'AMOUNT') sums.invoiced = null;
+  for (const output of form.querySelectorAll('[data-basket-total]')) {
+    const value = sums[output.dataset.basketTotal];
+    output.textContent = value === null ? '—' : formatPln(value);
+  }
+}
+
+function syncSource() {
+  const lines = $('use-lines').checked;
+  $('derived-overview').hidden = !lines;
+  $('aggregate-invoice-field').hidden = lines && !comparingTotals;
+  $('position-editor').hidden = !lines;
+  $('declared-note').hidden = !lines;
+  $('aggregate-values').hidden = lines && !comparingTotals;
+  $('toggle-declared').setAttribute('aria-expanded', String(lines && comparingTotals));
+  text('toggle-declared', comparingTotals ? 'Ukryj sumy wpisane do porównania' : 'Pokaż sumy wpisane do porównania');
+  text('source-status', lines
+    ? 'Źródło kalkulacji: pozycje BOK. Wcześniej wpisane sumy brutto służą do porównania.'
+    : 'Źródło kalkulacji: kwoty całego koszyka. Wpisane pozycje pozostają zapisane w formularzu do końca sprawy.');
+}
+
+function syncDocumentFields() {
+  const disabled = documentStateControl().value === 'NOT_ISSUED';
+  $('basket-invoiced').disabled = disabled;
+  for (const field of tbody.querySelectorAll('[data-field="invoiced"]')) field.disabled = disabled;
+}
+
+function proposedMonth() {
+  return nextCalendarDay($('last-old-date').value).slice(0, 7);
+}
+
 function datePreviews() {
-  text('month-preview',validMonth($('month').value)?`Wybrany okres: ${$('month').value.split('-').reverse().join('.')}`:'');
-  text('date-preview',$('effective-date').value?`Data: ${formatDate($('effective-date').value)}`:'');
-  text('end-date-preview',$('last-old-date').value?`Data: ${formatDate($('last-old-date').value)}`:'');
+  const suggested = proposedMonth();
+  const manual = monthEdited && suggested && $('month').value !== suggested;
+  const restore = $('restore-month');
+  if (!monthEdited) $('month').value = suggested;
+  restore.hidden = !manual;
+  restore.textContent = manual ? `Wróć do ${formatPeriod(suggested)}` : '';
+  const month = $('month').value;
+  const preview = validMonth(month) ? polishMonth.format(new Date(month + '-01T00:00:00Z')) : '';
+  text('month-preview', manual ? preview + ' · Miesiąc zmieniono ręcznie.' : preview);
+  const change = nextCalendarDay($('last-old-date').value);
+  text('date-preview', change ? `Zmiana warunków od ${formatDate(change)}.` : '');
 }
-function invalidate(message='Dane zmienione — oblicz ponownie, aby otrzymać aktualny wynik.') {
+
+function updateConfirmation() {
+  const checkbox = $('invoice-confirmed');
+  const data = readForm();
+  const month = validMonth(data.month) ? formatPeriod(data.month) : 'wybranego miesiąca';
+  text('confirm-label', `Kwoty „Na fakturze” sprawdziłem w MMS dla ${month}.`);
+  const confirmation = data.source === 'lines' ? evaluateCorrection(data).confirmation : { allowed: false, reason: '' };
+  checkbox.disabled = !confirmation.allowed;
+  if (!confirmation.allowed) checkbox.checked = false;
+  text('confirmation-hint', confirmation.reason);
+}
+
+function invalidate(message='Dane zmienione — oblicz ponownie, aby otrzymać aktualny wynik.', clearConfirmation=true) {
   revision++;
-  $('results').hidden=true;
-  $('summary').value=''; $('copy-summary').disabled=true;
-  text('copy-feedback',''); text('form-feedback',message);
-  $('errors').hidden=true;$('errors').replaceChildren();
-  for(const el of form.querySelectorAll('[aria-invalid]')) {
+  if (clearConfirmation) $('invoice-confirmed').checked = false;
+  $('results').hidden = true;
+  $('result-empty').hidden = false;
+  $('copy-preview').open = false;
+  $('result-heading').removeAttribute('data-result-state');
+  $('summary').value = '';
+  $('copy-summary').disabled = true;
+  text('copy-scope', ''); text('copy-feedback', ''); text('form-feedback', message);
+  $('errors').hidden = true; $('errors').replaceChildren();
+  for (const el of form.querySelectorAll('[aria-invalid]')) {
     el.removeAttribute('aria-invalid');
-    if((el.getAttribute('aria-describedby')??'').startsWith('error-description'))el.removeAttribute('aria-describedby');
+    if (el.dataset.previousDescription) el.setAttribute('aria-describedby', el.dataset.previousDescription);
+    else el.removeAttribute('aria-describedby');
+    delete el.dataset.previousDescription;
   }
-  for(const id of ['total-old','total-new','total-invoiced']) text(id,'—');
   datePreviews();
-}
-function correctionAction(delta) {
-  const amount=formatPln(delta.replace(/^-/,''));
-  if(delta.startsWith('-'))return {label:'Zwiększ fakturę o',amount,explanation:'Należność jest wyższa niż kwota na fakturze. Nie wystawiaj automatycznej dopłaty — wymaga weryfikacji.'};
-  if(delta==='0.00')return {label:'Faktura bez zmiany',amount,explanation:'Należność jest taka sama jak kwota na fakturze.'};
-  return {label:'Zmniejsz fakturę o',amount,explanation:'Należność po korekcie jest niższa niż kwota na fakturze.'};
-}
-function syncScenario() {
-  document.querySelectorAll('[data-scenario]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.scenario===$('event-type').value)));
-  const termination=$('event-type').value==='WYPOWIEDZENIE';
-  const increase=$('event-type').value==='PODWYŻKA';
-  $('end-date-field').hidden=!termination;
-  $('last-old-date').required=termination;
-  $('effective-date').readOnly=termination;
-  $('effective-required').hidden=termination;
-  if(termination)$('effective-date').value=nextDay($('last-old-date').value);
-  text('effective-label',termination?'Pierwszy dzień bez usługi':increase?'Data zmiany warunków':'Od kiedy obowiązuje nowy abonament?');
-  text('date-hint',termination?'Obliczamy automatycznie jako dzień po ostatnim dniu usługi.':increase?'Od 1. dnia miesiąca naliczamy nową cenę. Zmiana od 2. dnia lub później: stara cena do końca miesiąca, nowa od następnego miesiąca.':'Nowe warunki obowiązują od tego dnia włącznie.');
-  $('termination-note').hidden=!termination;
-  for(const el of tbody.querySelectorAll('[data-field="new"]')) {
-    if(termination&&!el.disabled){el.dataset.previousPrice=el.value;el.value='0,00';}
-    if(!termination&&el.disabled){el.value=el.dataset.previousPrice??'';delete el.dataset.previousPrice;}
-    el.disabled=termination;
-  }
+  syncDocumentFields();
+  updateGrossSums();
+  updateConfirmation();
 }
 function updateCount() { text('row-count',`${tbody.rows.length} ${tbody.rows.length===1?'pozycja':'pozycji'}`); $('add-position').disabled=tbody.rows.length>=50; }
 function addRow(values={}) {
   if(tbody.rows.length>=50) return;
   const id=nextRowId++,tr=document.createElement('tr');
+  tr.dataset.rowId = String(id);
   const fields=[
-    ['Usługa',`<select data-field="service" aria-label="Usługa pozycji ${id}">${Object.entries(SERVICES).map(([key,label])=>`<option value="${key}">${label}</option>`).join('')}</select>`],
-    ...[['old','Dotychczasowy abonament miesięczny'],['new','Nowy abonament miesięczny']].map(([key,label])=>[label,`<input data-field="${key}" inputmode="decimal" type="text" maxlength="64" aria-label="${label} pozycji ${id}" placeholder="Wpisz kwotę w zł" required><small>Wymagane</small>`]),
-    ['Już naliczono na fakturze',`<input data-field="invoiced" inputmode="decimal" type="text" maxlength="64" aria-label="Kwota na fakturze pozycji ${id}" placeholder="Jak dotychczasowy abonament" disabled required><label class="invoice-toggle"><input data-invoice-override type="checkbox"> Na fakturze jest inna kwota</label><label class="invoice-toggle confirm-invoice"><input data-invoice-confirm type="checkbox"> Sprawdziłem kwotę na fakturze dla tej usługi</label>`],
-    ['Szczegóły',`<details class="row-meta"><summary>Podstawa i VAT</summary><label>Podstawa<select data-field="basis" aria-label="Podstawa pozycji ${id}"><option value="gross">Brutto</option><option value="net">Netto</option></select></label><label>VAT (informacja)<select data-field="vat" aria-label="VAT pozycji ${id}"><option value="">Nieokreśl.</option><option value="23">23%</option><option value="8">8%</option><option value="5">5%</option><option value="0">0%</option><option value="zw">Zw.</option></select></label></details>`],
+    ['Pozycja / usługa',`<select data-field="service" aria-label="Usługa pozycji ${id}">${serviceOptions}</select>`],
+    ...[['old','Dotychczasowy abonament miesięczny'],['new','Nowy abonament miesięczny']].map(([key,label])=>[label,`<input data-field="${key}" inputmode="decimal" type="text" maxlength="64" aria-label="${label} pozycji ${id}" placeholder="0,00 zł" required>`]),
+    ['Na fakturze',`<input data-field="invoiced" inputmode="decimal" type="text" maxlength="64" aria-label="Kwota na fakturze pozycji ${id}" placeholder="0,00 zł">`],
+    ['Szczegóły',`<details class="row-meta"><summary>Dane pozycji</summary><label>Opcjonalna nazwa<input data-field="label" type="text" maxlength="160" aria-label="Nazwa pozycji ${id}" placeholder="Nazwa pozycji (opcjonalna)"></label><label>Podstawa<select data-field="basis" aria-label="Podstawa pozycji ${id}"><option value="gross">Brutto</option><option value="net">Netto</option></select></label><label>VAT (informacja)<select data-field="vat" aria-label="VAT pozycji ${id}"><option value="">Nieokreśl.</option><option value="23">23%</option><option value="8">8%</option><option value="5">5%</option><option value="0">0%</option><option value="zw">Zw.</option></select></label></details>`],
     ['',`<button type="button" class="remove-row" data-action="remove" aria-label="Usuń pozycję ${id}">×</button>`],
   ];
   for(const [label,markup] of fields) { const td=document.createElement('td'); td.dataset.label=label; td.innerHTML=markup; tr.append(td); }
   for(const input of tr.querySelectorAll('[data-field]')) {
     if(values[input.dataset.field]!==undefined) input.value=values[input.dataset.field];
   }
-  tr.querySelector('[data-invoice-override]').checked=values.invoiced!==undefined&&values.invoiced!==values.old;
-  syncInvoice(tr);
-  tr.querySelector('[data-invoice-confirm]').checked=values.confirmed===true;
-  tbody.append(tr); syncScenario(); updateCount();
-}
-function syncInvoice(tr) {
-  const override=tr.querySelector('[data-invoice-override]').checked;
-  const invoiced=tr.querySelector('[data-field="invoiced"]');
-  invoiced.disabled=!override;
-  if(!override)invoiced.value=tr.querySelector('[data-field="old"]').value;
+  tbody.append(tr); updateCount();
 }
 function readForm() {
   return {
-    calculationMode:document.querySelector('input[name="calculation-mode"]:checked').value,
-    month:$('month').value,effectiveDate:$('effective-date').value,type:$('event-type').value,
-    lastOldDate:$('event-type').value==='WYPOWIEDZENIE'?$('last-old-date').value:'',
-    dateVerified:true,multipleDates:$('multiple-dates').checked,unresolvedDiscounts:$('unresolved-discounts').checked,
-    rows:Array.from(tbody.rows,tr=>Object.fromEntries(Array.from(tr.querySelectorAll('[data-field]'),el=>[el.dataset.field,el.value.trim()]))),
+    source: $('use-lines').checked ? 'lines' : 'aggregate',
+    month: $('month').value,
+    lastOldDate: $('last-old-date').value,
+    totals: {
+      old: normalizeMoney($('basket-old').value),
+      new: normalizeMoney($('basket-new').value),
+      invoiced: normalizeMoney($('basket-invoiced').value),
+    },
+    rows: readRows(),
+    documentState: documentStateControl().value,
+    invoiceConfirmed: $('invoice-confirmed').checked,
+    basketVat: $('use-lines').checked ? $('basket-vat').value : '',
+    scope: $('billing-scope').value,
+    dateVerified: !$('date-uncertain').checked,
+    multipleDates: $('multiple-dates').checked,
+    unresolvedDiscounts: $('unresolved-discounts').checked,
+    nonComparableScope: $('non-comparable').checked,
+    componentsChanged: $('components-changed').checked,
   };
 }
-const errorCopy={
-  DATE_NOT_VERIFIED:'Potwierdź, że skuteczna data została ustalona poza kalkulatorem.',
-  INVALID_MONTH:'Wybierz miesiąc i rok rozliczeniowy w kalendarzu, np. 11.2026.',INVALID_DATE:'Wpisz poprawną datę kalendarzową.',
-  INCONSISTENT_DATES:'Pierwszy dzień bez usługi musi przypadać po ostatnim dniu świadczenia. Sprawdź ostatni dzień usługi.',
-  END_DATE_REQUIRED:'Wpisz ostatni dzień świadczenia usługi.',
-  DIRECTION_MISMATCH:'Wybrany scenariusz nie odpowiada zmianie SUMY koszyka. Sprawdź stary i nowy abonament wszystkich pozycji.',
+
+const fieldNames = {
+  old: 'Dotychczasowy abonament', new: 'Nowy abonament', invoiced: 'Kwota na fakturze',
+  basis: 'Podstawa kwoty', vat: 'Kategoria VAT',
 };
-function showError(error) {
-  const box=$('errors');box.replaceChildren();
-  const title=document.createElement('strong');title.textContent='Obliczenie zatrzymane';
-  const parts=error.field?.startsWith('rows.')?error.field.split('.'):null;
-  const target=parts?Array.from(tbody.rows[Number(parts[1])]?.querySelectorAll('[data-field]')??[]).find(el=>el.dataset.field===parts[2]):null;
-  const lookup={DATE_NOT_VERIFIED:'date-verified',INVALID_MONTH:'month',INVALID_DATE:'effective-date',INCONSISTENT_DATES:'last-old-date',END_DATE_REQUIRED:'last-old-date',DIRECTION_MISMATCH:'event-type'};
-  const field=target??(error.code==='DIRECTION_MISMATCH'?document.querySelector('[data-scenario][aria-pressed="true"]'):$(lookup[error.code]??'month'));
-  const fieldNames={old:'Dotychczasowy abonament miesięczny',new:'Nowy abonament miesięczny',invoiced:'Kwota na fakturze',basis:'Podstawa kwoty',vat:'Kategoria VAT'};
-  const prefix=parts?`Pozycja ${Number(parts[1])+1} — ${fieldNames[parts[2]]??'dane pozycji'}: `:'';
-  const description=document.createElement('p');description.id='error-description';
-  description.textContent=prefix+(errorCopy[error.code]??error.message??'Sprawdź dane formularza.');
-  box.append(title,description);
-  if(field){
-    const details=field.closest('details');if(details)details.open=true;
-    field.setAttribute('aria-invalid','true');field.setAttribute('aria-describedby','error-description');
-    const jump=document.createElement('button');jump.type='button';jump.className='button quiet';jump.textContent='Przejdź do błędnego pola';
-    jump.addEventListener('click',()=>field.focus());box.append(jump);
-  }
-  box.hidden=false;box.focus();
-  text('form-feedback','Nie utworzono wyniku. Popraw wskazane dane i oblicz ponownie.');
-}
-const warningCopy={
-  D11_ACCOUNTING_GATE_OPEN:['Weryfikacja księgowa · Kwoty są robocze. VAT, sposób zapisu korekty i zaokrąglenia wymagają potwierdzenia przez rozliczenia.','warning'],
-  INVOICE_DIFFERS_FROM_OLD:['Sprawdź fakturę · Już naliczona kwota różni się od dotychczasowego abonamentu. Upewnij się, że porównujesz ten sam okres i te same opłaty.','warning'],
-  ADDITIONAL_AMOUNT_REVIEW:['Sprawdź zwiększenie · Należność przekracza kwotę na fakturze. Dodatkowe naliczenie wymaga weryfikacji w uprawnionym systemie.','escalation'],
-  NO_PRICE_CHANGE:['Informacja · Brak zmiany sumy abonamentu. Długość miesiąca sama w sobie nie tworzy rabatu.','info'],
-  ZERO_FOR_ONE_SERVICE_DAY:['Informacja · 0 zł za pierwszy i jedyny dzień usługi w miesiącu 31-dniowym wynika z biznesowo przyjętej metody B. Nie blokujemy tego wyniku.','info'],
-  COMPONENTS_CHANGED_SAME_TOTAL:['Sprawdź składniki · Ceny usług zmieniły się, choć ich łączna cena pozostała taka sama. Rozbicie pozycji wymaga uzgodnienia z rozliczeniami.','warning'],
-  UNALLOCATED_ROUNDING:['Sprawdź grosze · Suma zaokrąglonych pozycji różni się od wyniku łącznego. Reszta jest nieprzypisana; jej rozliczenie wymaga uzgodnienia.','warning'],
-  LINE_INCREASE_REVIEW:['Sprawdź pozycję · Co najmniej jedna usługa wymaga zwiększenia naliczenia. Sprawdź obsługę takiej zmiany w MMS.','warning'],
-  NEGATIVE_LINE_PROPOSAL:['Eskalacja · Ujemna propozycja należności pozycji. Ten podział wymaga indywidualnej kontroli księgowej.','escalation'],
+const problemField = {
+  DATE_NOT_VERIFIED: 'date-uncertain', INVALID_MONTH: 'month',
+  INVALID_DATE: 'last-old-date', INCONSISTENT_DATES: 'last-old-date',
+  END_DATE_REQUIRED: 'last-old-date', MULTIPLE_DATES: 'multiple-dates',
+  UNRESOLVED_DISCOUNTS: 'unresolved-discounts', NON_COMPARABLE_SCOPE: 'non-comparable',
+  COMPONENTS_CHANGED_SAME_TOTAL: 'components-changed',
 };
-function renderInvoicePlan(result) {
-  const plan=buildInvoicePlan(result),body=$('invoice-plan').querySelector('tbody');
-  body.replaceChildren();$('invoice-plan').hidden=false;
-  text('invoice-comparison',`Na fakturze było ${formatPln(result.totals.invoiced)}. Należność po korekcie: ${formatPln(result.global.due)}.`);
-  const period=range=>range?`${formatDate(range.from)} – ${formatDate(range.to)}`:'Brak naliczenia w tym miesiącu';
-  if(!plan.available) {
-    text('invoice-plan-status','Rozbicie starego i nowego abonamentu do uzgodnienia: składniki zmieniły się przy stałej sumie. Sposób rozpisania pozycji wymaga kontroli rozliczeń.');
-    text('invoice-parts-total','Do uzgodnienia');text('invoice-model-note','');
-    text('invoice-plan-control','Zachowano należność koszyka. Nie ustalono rozbicia między stary i nowy abonament; wymagana decyzja dla kompensujących się zmian pozycji.');
-    $('invoice-plan-status').className='message escalation';
-    return plan;
+
+function revealField(field) {
+  if (!field) return;
+  if (field.closest('#aggregate-values')) {
+    comparingTotals = true;
+    syncSource();
   }
-  $('invoice-plan-status').className='message info';
-  $('residual-heading').hidden=!plan.needsRoundingReview;
-  text('invoice-plan-status',plan.needsRoundingReview?'Sprawdź kwoty poniżej. Występują reszty groszowe — wymagają uzgodnienia przed przepisaniem pozycji.':'Poniżej: kwota, do której skorygować stary abonament, oraz nowa część do dodania. Kwoty robocze wymagają weryfikacji księgowej.');
-  for(const row of plan.rows) {
-    const tr=document.createElement('tr');
-    const service=document.createElement('td');service.textContent=`${row.number}. ${SERVICES[row.service]}`;tr.append(service);
-    const old=document.createElement('td');old.dataset.label='Stary abonament po korekcie';
-    const oldAmount=document.createElement('strong');oldAmount.dataset.field='old-charge';oldAmount.textContent=formatPln(row.oldCharge);old.append(oldAmount);
-    const oldPeriod=document.createElement('small');oldPeriod.textContent=period(row.oldPeriod);old.append(oldPeriod);
-    const adjustment=document.createElement('span');adjustment.textContent=`Było ${formatPln(row.invoiced)}. ${row.oldAdjustment==='0.00'?'Bez zmiany:':row.oldAdjustment.startsWith('-')?'Zmniejsz starą pozycję o':'Zwiększ starą pozycję o'} `;
-    const adjustmentAmount=document.createElement('span');adjustmentAmount.dataset.field='old-adjustment';adjustmentAmount.textContent=formatPln(row.oldAdjustment.replace(/^-/,''));adjustment.append(adjustmentAmount);old.append(adjustment);tr.append(old);
-    const next=document.createElement('td');next.dataset.label='Nowy abonament do dodania';
-    const newAmount=document.createElement('strong');newAmount.dataset.field='new-charge';newAmount.textContent=formatPln(row.newCharge);next.append(newAmount);
-    const newPeriod=document.createElement('small');newPeriod.textContent=row.newPeriod?`${period(row.newPeriod)}${row.newCharge==='0.00'&&row.newNumerator!=='0'?'. 0,00 zł po testowym zaokrągleniu; reszta wymaga uzgodnienia.':''}`:'Brak nowej opłaty w tym miesiącu.';next.append(newPeriod);tr.append(next);
-    const sum=document.createElement('td');sum.dataset.label='Razem części';sum.textContent=formatPln(row.partsTotal);tr.append(sum);
-    const residual=document.createElement('td');residual.dataset.label='Reszta do uzgodnienia';residual.hidden=!plan.needsRoundingReview;
-    const residualAmount=document.createElement('strong');residualAmount.dataset.field='period-residual';residualAmount.textContent=formatPln(row.partResidual,true);residual.append(residualAmount);tr.append(residual);
-    body.append(tr);
+  for (let details = field.closest('details'); details; details = details.parentElement.closest('details')) details.open = true;
+}
+
+function markField(field, description) {
+  field.dataset.previousDescription = field.getAttribute('aria-describedby') ?? '';
+  field.setAttribute('aria-invalid', 'true');
+  field.setAttribute('aria-describedby', description);
+}
+
+function errorField(result) {
+  const [group, index, key] = result.field?.split('.') ?? [];
+  const rowField = group === 'rows' && index !== undefined
+    ? tbody.rows[Number(index)]?.querySelector(`[data-field="${key}"]`) : null;
+  return rowField ?? (group === 'totals' ? $(`basket-${index}`)
+    : group === 'rows' ? $('use-lines')
+    : group === 'lastOldDate' ? $('last-old-date')
+    : group === 'basketVat' ? $('basket-vat')
+    : group === 'documentState' ? documentStateControl()
+    : $(problemField[result.code] ?? 'calculate'));
+}
+
+function renderErrorHeading(box, title) {
+  const head = document.createElement('div');
+  head.className = 'error-heading';
+  head.append(resultPill('Błąd danych', 'error'), title);
+  const client = document.createElement('p');
+  client.className = 'section-copy';
+  client.textContent = clientNote('ERROR');
+  $('result-empty').hidden = true;
+  box.replaceChildren(head, client);
+}
+
+function showError(result) {
+  const box = $('errors'), title = document.createElement('h2');
+  title.textContent = 'Błąd danych';
+  title.dataset.resultState = 'ERROR';
+  const description = document.createElement('p');
+  description.id = 'error-description';
+  const [group, index, key] = result.field?.split('.') ?? [];
+  const field = errorField(result);
+  const prefix = group === 'rows' && index !== undefined ? `Pozycja ${Number(index) + 1} — ${fieldNames[key] ?? 'dane pozycji'}: `
+    : group === 'totals' ? `${fieldNames[index]}: ` : '';
+  description.textContent = prefix + (result.code === 'INVALID_MONTH'
+    ? 'Wybierz miesiąc i rok rozliczeniowy.' : result.calculationReason);
+  renderErrorHeading(box, title);
+  box.append(description);
+  if (field && field !== $('calculate')) {
+    const jump = document.createElement('button');
+    jump.type = 'button';
+    jump.className = 'button quiet';
+    jump.textContent = 'Przejdź do wskazanego pola';
+    jump.addEventListener('click', () => { revealField(field); field.focus(); });
+    markField(field, description.id);
+    box.append(jump);
   }
-  text('invoice-parts-total',formatPln(plan.partsTotal));
-  text('invoice-plan-control',`Reszta podziału do wyniku koszyka: ${formatPln(plan.totalResidual,true)}. Reszty między częściami a wierszami: ${formatPln(plan.rowResidualSum,true)}; reszta między wierszami a koszykiem: ${formatPln(plan.basketResidual,true)}. Nie przydzielono ich do żadnej pozycji.`);
-  if(plan.fullMonthlyPolicy) {
-    let note='Obowiązuje pełna cena miesięczna, bez naliczania cząstkowego.';
-    if(result.global.method==='NO_SERVICE')note='Przez cały analizowany miesiąc usługa jest zakończona. Należność wynosi 0,00 zł.';
-    if(plan.higherPriceStart)note=`${!result.effectiveDate.startsWith(result.month)?'Data zmiany leży poza analizowanym miesiącem. ':''}${result.global.method==='UPGRADE_NEXT_MONTH'?'Podwyżka w trakcie miesiąca: dotychczasowa cena do końca miesiąca, bez cząstkowej dopłaty.':note} Wyższy abonament od ${formatDate(plan.higherPriceStart)}.`;
-    text('invoice-model-note',note);
-  } else if(result.rule) text('invoice-model-note',`Liczymy faktyczne dni obu okresów: ${plan.calendarOld?.days??0} dni dotychczasowego i ${plan.calendarNew?.days??0} dni nowego abonamentu. Każdą część mnożymy przez cenę po rabatach i dzielimy przez 30. Nie dodajemy ani nie odejmujemy dni, aby wyrównać miesiąc do 30.`);
-  else text('invoice-model-note',`Dla całego koszyka wybrano jeden niższy wariant A/B. Podział każdej pozycji stosuje współczynniki: stary abonament ${plan.oldUnits}/30, nowy abonament ${plan.newUnits}/30.`);
-  return plan;
+  box.hidden = false;
+  if (field && field !== $('calculate')) { revealField(field); field.focus(); }
+  else box.focus();
+  text('form-feedback', 'Sprawdź komunikat przed ponownym obliczeniem.');
 }
-function resultSteps(result,plan,row) {
-  if(result.rule)return calculationSteps(row);
-  if(result.global.method==='A'||result.global.method==='B'||result.global.method==='A=B')return [
-    `Stary abonament: ${formatPln(row.oldCharge)} (${plan.oldUnits}/30 pełnej ceny).`,
-    `Nowy abonament: ${formatPln(row.newCharge)} (${plan.newUnits}/30 pełnej ceny).`,
-    `Dla całego koszyka wybrano wariant ${result.global.method==='A=B'?'A/B (oba dają tę samą kwotę)':result.global.method}, bo daje niższą należność przed zaokrągleniem.`
-  ];
-  return [row.newPeriod?`Pełny nowy abonament: ${formatPln(row.newCharge)}.`:`Pełny dotychczasowy abonament: ${formatPln(row.oldCharge)}.`];
-}
-function render(result) {
-  const r=result,g=r.global;
-  const plan=renderInvoicePlan(result);
-  text('total-old',formatPln(r.totals.old));text('total-new',formatPln(r.totals.new));text('total-invoiced',formatPln(r.totals.invoiced));
-  const correction=correctionAction(g.delta);
-  text('due',formatPln(g.due)); text('delta-action',correction.label); text('delta',correction.amount); text('global-method',billingLabel(g.method));
-  text('nominal-price',formatPln(r.totals.new));
-  text('result-period',`${r.month.split('-').reverse().join('.')} · zmiana od ${formatDate(r.effectiveDate)}${r.lastOldDate?` · ostatni dzień usługi: ${formatDate(r.lastOldDate)}`:''}`);
-  text('delta-explanation',correction.explanation);
-  text('method-explanation',r.rule?'Ceny po rabatach × dni korzystania ÷ 30.':(g.method==='A'||g.method==='B'||g.method==='A=B')?'Porównujemy dwa warianty i wybieramy niższą należność dla całego koszyka.':'Szczegóły naliczenia i daty poniżej.');
-  text('days-month',g.daysInMonth);text('days-old',g.daysOld);text('days-new',g.daysNew);
-  const steps=$('calculation-steps');steps.replaceChildren();
-  if(plan.available)for(const row of plan.rows) {
-    const article=document.createElement('article');article.className='calculation-step';
-    const heading=document.createElement('h3');heading.textContent=`${row.number}. ${SERVICES[row.service]}`;article.append(heading);
-    for(const step of resultSteps(r,plan,row)){const p=document.createElement('p');p.textContent=step;article.append(p);}
-    const sum=document.createElement('p');sum.className='step-sum';sum.textContent=`Razem: ${formatPln(row.oldCharge)} + ${formatPln(row.newCharge)} = ${formatPln(row.partsTotal)}.`;article.append(sum);steps.append(article);
-  } else {const p=document.createElement('p');p.textContent='Rozbicie zmienionych składników wymaga uzgodnienia z rozliczeniami.';steps.append(p);}
-  text('formula-note',r.rule?'Część miesiąca: cena po rabatach × rzeczywista liczba dni ÷ 30. Zaokrąglamy dopiero wynik części do groszy, nie stawkę dzienną. Pełny miesiąc bez zmiany ceny zachowuje pełny abonament.':'Wariant A/B: najpierw porównujemy dwa wyniki dla całego koszyka, przed zaokrągleniem. Do wszystkich pozycji stosujemy potem jeden wybrany wariant; nie wybieramy niższej kwoty osobno dla każdej usługi.');
-  const body=$('line-results').tBodies[0];body.replaceChildren();
-  for(const row of r.rows) {
-    const tr=document.createElement('tr');
-    const values=[['Pozycja',`${row.label||`Pozycja ${row.number}`} · ${SERVICES[row.service]}`,'label'],['Sposób naliczenia',billingLabel(row.method),'method'],['Naliczono na fakturze',formatPln(row.invoiced),'invoiced'],['Należność — testowa',formatPln(row.due),'due'],['Różnica względem faktury',formatPln(row.delta,true),'delta']];
-    for(const [label,value,key] of values) {const td=document.createElement('td');td.dataset.label=label;td.dataset.field=key;td.textContent=value;if(key==='label'&&row.description){const small=document.createElement('span');small.textContent=row.description;td.append(small);}tr.append(td);}
-    body.append(tr);
-  }
-  text('row-sum',formatPln(r.rowSum));text('rounding-residual',formatPln(r.residual,true));
-  text('reconciliation-status',r.reconciled?'Kontrola sum: propozycje pozycji są równe należności łącznej. Kwoty nadal wymagają weryfikacji księgowej.':`Rozbieżność: ${formatPln(r.rowSum)} + (${formatPln(r.residual,true)}) = ${formatPln(g.due)}. Grosze wymagają uzgodnienia z rozliczeniami.`);
-  const messages=$('messages');messages.replaceChildren();
-  for(const code of r.warnings) if(warningCopy[code]) {const [message,kind]=warningCopy[code];const p=document.createElement('p');p.className=`message ${kind}`;p.textContent=message;messages.append(p);}
-  $('summary').value=buildSummary(r);$('copy-summary').disabled=false;
-  $('results').hidden=false; text('form-feedback','Obliczono. Wynik jest propozycją testową wymagającą kontroli.');
-  $('result-heading').focus({preventScroll:true});$('results').scrollIntoView({behavior:'instant',block:'start'});
-}
-function changed(event) {
-  if(event.target===$('example-select'))$('load-example').disabled=!event.target.value;
-  if(event.target===$('month'))tbody.querySelectorAll('[data-invoice-confirm]').forEach(input=>{input.checked=false;});
-  if(event.target===$('last-old-date')&&$('event-type').value==='WYPOWIEDZENIE')$('effective-date').value=nextDay(event.target.value);
-  if(event.target.matches('[data-field="old"], [data-field="invoiced"], [data-field="service"], [data-invoice-override]'))event.target.closest('tr').querySelector('[data-invoice-confirm]').checked=false;
-  if(event.target.matches('[data-field="old"], [data-invoice-override]'))syncInvoice(event.target.closest('tr'));
-  if(event.target===$('event-type'))syncScenario();
-  invalidate();
-}
-form.addEventListener('input',changed);
-form.addEventListener('change',changed);
-for (const button of document.querySelectorAll('[data-scenario]')) button.addEventListener('click',()=>{
-  $('event-type').value=button.dataset.scenario;
-  syncScenario();
-  invalidate();
-});
-form.addEventListener('submit',event=>{
-  event.preventDefault(); invalidate('Sprawdzam dane formularza.');
-  try {
-    const missing=[];
-    if(!$('month').value)missing.push(['Miesiąc i rok rozliczeniowy',$('month')]);
-    const termination=$('event-type').value==='WYPOWIEDZENIE';
-    if(termination&&!$('last-old-date').value)missing.push(['Ostatni dzień usługi',$('last-old-date')]);
-    if(!termination&&!$('effective-date').value)missing.push(['data zmiany',$('effective-date')]);
-    if(termination&&$('last-old-date').value&&!$('effective-date').value)missing.push(['Nie można wyliczyć następnego dnia — sprawdź ostatni dzień usługi',$('last-old-date')]);
-    Array.from(tbody.rows).forEach((tr,index)=>{
-      const prefix=`Pozycja ${index+1} — `;
-      for(const [key,label] of [['old','Dotychczasowy abonament'],['new','Nowy abonament'],['invoiced','Kwota na fakturze']]) {
-        const field=tr.querySelector(`[data-field="${key}"]`);
-        if(!field.value.trim()&&!field.disabled)missing.push([prefix+label,field]);
-      }
-      const confirm=tr.querySelector('[data-invoice-confirm]');
-      if(!confirm.checked)missing.push([prefix+'Sprawdź kwotę na fakturze i potwierdź',confirm]);
-    });
-    if(missing.length){
-      const box=$('errors');const heading=document.createElement('strong');heading.textContent='Uzupełnij brakujące informacje';box.replaceChildren(heading);
-      const list=document.createElement('ul');
-      missing.forEach(([label,field],index)=>{const li=document.createElement('li'),button=document.createElement('button');li.id=`error-description-${index}`;button.type='button';button.className='missing-link';button.textContent=label;button.addEventListener('click',()=>field.focus());li.append(button);list.append(li);field.setAttribute('aria-invalid','true');field.setAttribute('aria-describedby',li.id);});
-      box.append(list);box.hidden=false;box.focus();text('form-feedback','Uzupełnij wskazane pola i oblicz ponownie.');return;
+
+function renderExplanation(explanation, parts) {
+  const details = $('calculation-details');
+  details.hidden = !explanation;
+  details.open = false;
+  if (!explanation) return;
+  text('global-method', explanation.method);
+  text('method-explanation', explanation.reason);
+  text('calculation-steps', explanation.formula);
+  text('formula-note', explanation.note);
+  const [days, old, next] = explanation.days;
+  text('days-month', days);
+  text('days-old', old);
+  text('days-new', next);
+  const container = $('calculation-parts');
+  container.replaceChildren();
+  for (const part of parts) {
+    const block = document.createElement('article');
+    block.className = 'calculation-step';
+    const heading = document.createElement('h4');
+    heading.textContent = part.label;
+    block.append(heading);
+    for (const key of ['old', 'next', 'remainder']) {
+      if (!part[key]) continue;
+      const paragraph = document.createElement('p');
+      paragraph.dataset.field = key;
+      paragraph.textContent = part[key];
+      block.append(paragraph);
     }
-    const {calculationMode,...data}=readForm();
-    render(calculationMode==='AB_MIN'?evaluateBasket(data):evaluateDailyBasket(data));
-  } catch(error) {showError(error);}
-});
-$('add-position').addEventListener('click',()=>{invalidate();addRow();tbody.lastElementChild.querySelector('input').focus();});
-tbody.addEventListener('click',event=>{const button=event.target.closest('[data-action="remove"]');if(!button)return;invalidate();button.closest('tr').remove();updateCount();if(tbody.rows.length)tbody.rows[0].querySelector('input').focus();else $('add-position').focus();});
-$('load-example').addEventListener('click',()=>{
-  if(!$('example-select').value)return;
-  const data=example($('example-select').value);invalidate('Wczytano przykład testowy. Sprawdź datę i pełne ceny miesięczne, a następnie oblicz korektę.');
-  $('event-type').value=data.type;$('month').value=data.month;$('effective-date').value=data.effectiveDate;$('last-old-date').value=data.lastOldDate;
-  for(const id of ['multiple-dates','unresolved-discounts'])$(id).checked=false;
-  tbody.replaceChildren();nextRowId=1;data.rows.forEach(row=>addRow({...row,confirmed:true}));syncScenario();datePreviews();(data.type==='WYPOWIEDZENIE'?$('last-old-date'):$('effective-date')).focus();
-});
-function resetCalculator() {
-  HTMLFormElement.prototype.reset.call(form);$('month').value='';$('effective-date').value='';$('last-old-date').value='';
-  $('example-select').value='';$('load-example').disabled=true;
-  tbody.replaceChildren();nextRowId=1;addRow();syncScenario();invalidate('Formularz wyczyszczony. Wpisz dane lub wczytaj przykład testowy.');document.querySelector('[data-scenario][aria-pressed="true"]').focus();
-  for(const details of document.querySelectorAll('main details'))details.open=false;
-  $('messages').replaceChildren();$('calculation-steps').replaceChildren();
-  $('invoice-plan').hidden=true;$('invoice-plan').querySelector('tbody').replaceChildren();$('line-results').tBodies[0].replaceChildren();
+    container.append(block);
+  }
 }
-for(const id of ['reset','reset-result'])$(id).addEventListener('click',resetCalculator);
+
+function renderBreakdown(view) {
+  const labels = { label: 'Pozycja', invoiced: 'Na fakturze', due: 'Należność', delta: 'Różnica (poglądowo)' };
+  const body = $('line-results').tBodies[0];
+  body.replaceChildren();
+  $('bok-result').hidden = !view.rows.length;
+  for (const row of view.rows) {
+    const tr = body.insertRow();
+    for (const [key, label] of Object.entries(labels)) {
+      const td = tr.insertCell();
+      td.dataset.label = label;
+      td.dataset.field = key;
+      td.textContent = row[key];
+      if (key === 'delta' && row.note) {
+        const note = document.createElement('small');
+        note.textContent = row.note;
+        td.append(note);
+      }
+    }
+  }
+  $('remainder-row').hidden = !view.remainder;
+  text('rounding-residual', view.remainder);
+}
+
+function render(result) {
+  const view = buildResultPresentation(result);
+  const heading = $('result-heading');
+  heading.dataset.resultState = result.decision;
+  heading.dataset.dataStatus = result.dataStatus;
+  heading.dataset.documentState = result.documentState;
+  text('result-heading', view.title);
+  const tone = result.dataStatus === 'CONFIRMED' && result.decision === 'CORRECTION' ? 'success'
+    : ['REVIEW', 'REFER', 'INVOICE_REQUIRED'].includes(result.decision) ? 'caution' : 'info';
+  $('result-pill').replaceWith(Object.assign(resultPill(view.title, tone), { id: 'result-pill' }));
+  text('client-note', clientNote(tone === 'success' ? 'CONFIRMED' : result.decision));
+  text('result-period', view.dateDetails);
+  text('delta-explanation', view.message);
+  text('invoiced-source', view.dataNote);
+  text('delta', view.amount ?? '');
+  $('result-main-amount').hidden = view.amount === null;
+
+  const fields = $('result-fields');
+  fields.replaceChildren();
+  fields.hidden = !view.fields.length;
+  for (const { id, label, value } of view.fields) {
+    const group = document.createElement('div');
+    const term = document.createElement('dt');
+    const definition = document.createElement('dd');
+    term.id = id === 'nominal-price' ? 'next-month-label' : `${id}-label`;
+    term.textContent = id === 'due' && result.type === 'PODWYŻKA'
+      ? 'Abonament za ' + polishMonth.format(new Date(result.month + '-01T00:00:00Z')) : label;
+    if ((id === 'due' && result.decision === 'INVOICE_REQUIRED')
+      || (id === 'result-invoiced' && result.decision === 'NO_CORRECTION')) group.classList.add('featured-amount');
+    definition.id = id;
+    definition.textContent = value;
+    group.append(term, definition);
+    fields.append(group);
+  }
+
+  const variants = $('document-variants');
+  variants.replaceChildren();
+  variants.hidden = !view.variants.length;
+  for (const description of view.variants) {
+    const item = document.createElement('li');
+    item.textContent = description;
+    variants.append(item);
+  }
+  renderExplanation(view.explanation, view.parts);
+  renderBreakdown(view);
+
+  const list = $('scenario-warnings');
+  const warnings = new Set(view.warnings.map(([message]) => message)
+    .filter(message => !message.endsWith('(D05).') && !message.endsWith('(D11).')));
+  list.replaceChildren(...Array.from(warnings, message => {
+    const item = document.createElement('li');
+    item.textContent = message;
+    return item;
+  }));
+  $('warning-details').hidden = !list.childElementCount;
+  $('warning-details').open = false;
+  $('summary').value = copyResultPresentation(view);
+  $('copy-summary').disabled = !view.copyAllowed;
+  text('copy-scope', view.rows.length && !view.copyRows ? 'Kopia obejmuje wynik koszyka. Pozycje będą dostępne po potwierdzeniu danych.' : '');
+  $('results').hidden = false;
+  $('result-empty').hidden = true;
+  text('form-feedback', '');
+  const rect = heading.getBoundingClientRect();
+  const headingVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+  if (result.decision === 'INVOICE_REQUIRED') {
+    documentStateControl().focus({ preventScroll: headingVisible });
+  } else {
+    heading.focus({ preventScroll: true });
+    if (!headingVisible) heading.scrollIntoView({ block: 'center' });
+  }
+}
+
+function saveDocumentState() {
+  if ($('use-lines').checked) linesDocumentState = documentStateControl().value;
+  else aggregateDocumentState = documentStateControl().value;
+}
+
+function changed(event) {
+  const target = event.target;
+  if (target === $('training-mode')) {
+    $('training-examples').hidden = !target.checked;
+    return;
+  }
+  if (target === $('example-select')) {
+    $('load-example').disabled = !target.value;
+    return;
+  }
+  if (target === $('month')) monthEdited = true;
+  if (target === $('use-lines')) {
+    if (target.checked && !tbody.rows.length) addRow();
+    if (!target.checked) comparingTotals = false;
+    setDocumentState(target.checked ? linesDocumentState : aggregateDocumentState);
+    syncSource();
+  }
+  if (target.matches('#basket-invoiced, [data-field="invoiced"]') && target.value.trim()) setDocumentState('AMOUNT');
+  saveDocumentState();
+  invalidate(undefined, target !== $('invoice-confirmed'));
+}
+form.addEventListener('input', changed);
+$('restore-month').addEventListener('click', () => {
+  monthEdited = false;
+  invalidate();
+  $('month').focus();
+});
+
+function missingFields(data) {
+  const missing = [];
+  if (!data.month) missing.push(['Miesiąc i rok rozliczeniowy', $('month')]);
+  if (!data.lastOldDate) missing.push(['Ostatni dzień starych warunków', $('last-old-date')]);
+
+  if (data.source === 'aggregate') {
+    const required = data.documentState === 'AMOUNT' ? moneyFields : ['old', 'new'];
+    for (const key of required) {
+      if (data.totals[key] === '') missing.push([fieldNames[key], $(`basket-${key}`)]);
+    }
+  } else {
+    Array.from(tbody.rows).forEach((tr, index) => {
+      const prefix = `Pozycja ${index + 1} — `;
+      for (const key of ['old', 'new']) {
+        const field = tr.querySelector(`[data-field="${key}"]`);
+        if (!field.value.trim() && !field.disabled) missing.push([prefix + fieldNames[key], field]);
+      }
+    });
+  }
+  return missing;
+}
+
+function showMissing(fields) {
+  const box = $('errors'), heading = document.createElement('h2');
+  heading.textContent = 'Błąd danych — uzupełnij brakujące informacje';
+  heading.dataset.resultState = 'ERROR';
+  const list = document.createElement('ul');
+  fields.forEach(([label, field], index) => {
+    const item = document.createElement('li'), button = document.createElement('button');
+    item.id = `error-description-${index}`;
+    button.type = 'button';
+    button.className = 'missing-link';
+    button.textContent = label;
+    button.addEventListener('click', () => { revealField(field); field.focus(); });
+    item.append(button);
+    list.append(item);
+    markField(field, item.id);
+  });
+  renderErrorHeading(box, heading);
+  box.append(list);
+  box.hidden = false;
+  revealField(fields[0][1]);
+  fields[0][1].focus();
+  text('form-feedback', 'Uzupełnij wskazane pola i oblicz ponownie.');
+}
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+  invalidate('Sprawdzam dane formularza.', false);
+  const data = readForm();
+  const result = evaluateCorrection(data);
+  if (result.decision === 'ERROR') {
+    const first = errorField(result);
+    const missing = missingFields(data);
+    if (missing.some(([,field]) => field === first)) showMissing(missing);
+    else showError(result);
+    return;
+  }
+  render(result);
+});
+
+$('toggle-declared').addEventListener('click', () => {
+  comparingTotals = !comparingTotals;
+  syncSource();
+});
+function appendPosition(field) {
+  addRow();
+  invalidate();
+  tbody.lastElementChild.querySelector(field).focus();
+}
+
+$('add-position').addEventListener('click', () => appendPosition('input'));
+tbody.addEventListener('keydown', event => {
+  const field = event.target;
+  if (event.key !== 'Enter' || event.repeat || event.isComposing || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey
+    || !field.matches('input[data-field]')) return;
+  event.preventDefault();
+  const lastMoney = tbody.lastElementChild?.querySelectorAll('input[inputmode="decimal"]:not(:disabled)');
+  if (field !== lastMoney?.[lastMoney.length - 1] || $('add-position').disabled) return;
+  appendPosition('[data-field="service"]');
+});
+tbody.addEventListener('click', event => {
+  const button = event.target.closest('[data-action="remove"]');
+  if (!button) return;
+  const row = button.closest('tr');
+  (row.nextElementSibling ?? row.previousElementSibling)?.querySelector('input').focus();
+  if (tbody.rows.length === 1) $('add-position').focus();
+  row.remove();
+  updateCount();
+  invalidate();
+});
+
+function clearBasket() {
+  for (const id of [...problemFlags, 'use-lines', 'invoice-confirmed']) $(id).checked = false;
+  $('basket-vat').value = '';
+  $('billing-scope').value = 'B2C';
+  setDocumentState('UNKNOWN');
+  aggregateDocumentState = 'UNKNOWN';
+  linesDocumentState = 'UNKNOWN';
+  monthEdited = false;
+  for (const key of moneyFields) {
+    const input = $(`basket-${key}`);
+    input.value = '';
+    input.readOnly = false;
+    input.disabled = false;
+  }
+  comparingTotals = false;
+  tbody.replaceChildren();
+  nextRowId = 1;
+  updateCount();
+  for (const details of document.querySelectorAll('main details')) details.open = false;
+}
+
+$('load-example').addEventListener('click', () => {
+  const data = example($('example-select').value);
+  if (!data || !$('training-mode').checked) return;
+  clearBasket();
+  $('month').value = data.month;
+  $('last-old-date').value = data.lastOldDate;
+  monthEdited = data.month !== proposedMonth();
+  if (data.rows.length > 1) {
+    $('use-lines').checked = true;
+    $('bok-details').open = true;
+    for (const row of data.rows) addRow(row);
+    setDocumentState('AMOUNT');
+  } else {
+    const { old, new: next, invoiced } = data.rows[0];
+    $('basket-old').value = old;
+    $('basket-new').value = next;
+    if (invoiced !== old) {
+      $('basket-invoiced').value = invoiced;
+      setDocumentState('AMOUNT');
+    }
+  }
+  saveDocumentState();
+  syncSource();
+  invalidate('Wczytano przykład testowy. Sprawdź dane i oblicz korektę.');
+  $('last-old-date').focus();
+});
+
+function resetCalculator() {
+  HTMLFormElement.prototype.reset.call(form);
+  clearBasket();
+  $('load-example').disabled = true;
+  $('training-examples').hidden = true;
+  syncSource();
+  invalidate('Formularz wyczyszczony.');
+  $('scenario-warnings').replaceChildren();
+  $('warning-details').hidden = true;
+  $('calculation-steps').replaceChildren();
+  $('line-results').tBodies[0].replaceChildren();
+  $('last-old-date').focus();
+}
+$('reset').addEventListener('click', resetCalculator);
 $('copy-summary').addEventListener('click',async()=>{
   const token=revision,summary=$('summary').value;
   if(!summary||$('copy-summary').disabled)return;
@@ -290,8 +592,12 @@ $('copy-summary').addEventListener('click',async()=>{
     if(token===revision)text('copy-feedback','Skopiowano robocze podsumowanie. Wymaga weryfikacji księgowej (D11).');
   } catch {
     if(token!==revision)return;
+    $('copy-preview').open = true;
     $('summary').focus();$('summary').select();
     text('copy-feedback','Nie udało się użyć schowka. Zaznaczono podsumowanie — skopiuj je skrótem Ctrl+C (na Macu ⌘C).');
   }
 });
-addRow();
+text('policy-version', ACTIVE_DEMO_POLICY.version);
+syncSource();
+datePreviews();
+syncDocumentFields();
