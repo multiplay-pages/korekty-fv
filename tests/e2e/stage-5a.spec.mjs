@@ -16,22 +16,21 @@ async function fillCase(page, input) {
   await page.locator('#last-old-date').fill(input.lastOldDate);
   if (await page.locator('#month').inputValue() !== input.month) await page.locator('#month').fill(input.month);
   if (input.source === 'lines') {
-    await page.locator('#bok-details > summary').click();
-    await page.locator('#use-lines').check();
+    await page.locator('input[name=calc-mode][value=BOK]').check();
     for (const [index, values] of input.rows.entries()) {
       if (index > 0) await page.locator('#add-position').click();
       const row = page.locator('#positions tbody tr').nth(index);
       await row.locator('[data-field=service]').selectOption(values.service);
+      // VAT pozycji: domyślny ze słownika usług, nadpisany wartością z przypadku (pole edytowalne).
+      if (values.vat) await row.locator('[data-field=vat]').selectOption(values.vat);
       await row.locator('[data-field=old]').fill(values.old);
       await row.locator('[data-field=new]').fill(values.new);
       if (values.invoiced) await row.locator('[data-field=invoiced]').fill(values.invoiced);
-      if (values.basis !== 'gross' || values.vat !== (input.basketVat || '23')) {
+      if (values.basis !== 'gross') {
         await row.locator('summary').click();
         await row.locator('[data-field=basis]').selectOption(values.basis);
-        await row.locator('[data-field=vat]').selectOption(values.vat);
       }
     }
-    await page.locator('#basket-vat').selectOption(input.basketVat || '');
   } else {
     await page.locator('#basket-old').fill(input.totals.old);
     await page.locator('#basket-new').fill(input.totals.new);
@@ -51,7 +50,10 @@ async function fillCase(page, input) {
   if (input.invoiceConfirmed && await confirmation.isEnabled()) await confirmation.check();
 }
 
-for (const [id,input,decision,dataStatus,amount,due] of matrix) {
+// Pozycja bez VAT (M25-brak-VAT) nie powstanie w formularzu: słownik usług zawsze podstawia stawkę. Blokadę potwierdzenia
+// bez VAT sprawdza test jednostkowy macierzy 5A, a podstawianie VAT — test E2E „słownik usług podstawia VAT…”.
+const uiMatrix = matrix.filter(([, input]) => !input.rows?.some(row => row.vat === ''));
+for (const [id,input,decision,dataStatus,amount,due] of uiMatrix) {
   test(`5A ${id}: stan, kwota i kopia`, async ({page}, testInfo) => {
     await fillCase(page,input);
     await page.locator('#calculate').click();
@@ -76,11 +78,12 @@ for (const [id,input,decision,dataStatus,amount,due] of matrix) {
     expect(copy).not.toMatch(/zwiększenie|do dodania|zmniejsz starą pozycję/i);
     if (amount !== null) {
       await expect(page.locator('#result-main-amount')).toBeVisible();
-      await expect(page.locator('#delta')).toHaveText(formatPln(amount, true));
-      expect(copy).toContain(`${formatPln(amount,true)} — zmniejszenie`);
+      // 26.11.2026: zmniejszenie faktury prezentowane ze znakiem minus (należność − F).
+      await expect(page.locator('#delta')).toHaveText(formatPln(`-${amount}`, true));
+      expect(copy).toContain(`Korekta faktury: ${formatPln(`-${amount}`, true)} (zmniejszenie)`);
     } else {
       await expect(page.locator('#result-main-amount')).toBeHidden();
-      expect(copy).not.toContain(' — zmniejszenie');
+      expect(copy).not.toContain('(zmniejszenie)');
     }
     const increaseInChange = /^M(11|12|13|14|15)/.test(id);
     if (due !== null && !increaseInChange) {
@@ -108,7 +111,7 @@ for (const [id,input,decision,dataStatus,amount,due] of matrix) {
         Array.from(row.cells, cell => cell.firstChild.textContent.trim()).join(' · ')));
       expect(rows).toHaveLength(input.rows.length);
       for (const row of rows) expect(copy).toContain(row);
-      const remainder = id === 'M24' ? '+0,01' : '−0,01';
+      const remainder = id === 'M24' ? '−0,01' : '+0,01';
       const remainderLabel = `Reszta korekty koszyka ${remainder} zł do uzgodnienia.`;
       await expect(page.locator('#rounding-residual')).toHaveText(remainderLabel);
       expect(copy.split('\n')).toContain(remainderLabel);
@@ -124,7 +127,7 @@ for (const [id,input,decision,dataStatus,amount,due] of matrix) {
       await expect(page.locator('#invoice-confirmed')).not.toBeChecked();
       if (id === 'M25') await expect(page.locator('#invoice-confirmed')).toBeEnabled();
       else await expect(page.locator('#invoice-confirmed')).toBeDisabled();
-      expect(copy).not.toMatch(/1\. Internet|Reszta korekty koszyka \+0,01 zł/);
+      expect(copy).not.toMatch(/1\. Internet|Reszta korekty koszyka −0,01 zł/);
     }
     if (['M01','M11','M24','R2a-ujemny-wiersz'].includes(id) && testInfo.project.name.startsWith('chromium')) {
       await page.screenshot({ path:testInfo.outputPath(`5A-${id}.png`), fullPage:true });
@@ -154,7 +157,7 @@ test('5A U7: edycja w BOK usuwa potwierdzenie i podsumowanie', async ({page}) =>
     () => page.locator('#month').fill('2026-10'),
     () => page.locator('#last-old-date').fill('2026-11-16'),
     () => page.locator('#positions [data-field=invoiced]').fill('160'),
-    () => page.locator('#basket-vat').selectOption('8'),
+    () => page.locator('#positions [data-field=vat]').first().selectOption('8'),
     () => page.locator('#add-position').click(),
     () => page.locator('[data-action=remove]').click(),
     () => page.locator('#document-state input[value="NOT_ISSUED"]').check(),
@@ -198,7 +201,7 @@ test('5A Q-06: kontrast tekstu, granic pól i wskaźnika fokusu', async ({page},
       return (light+0.05)/(dark+0.05);
     };
     const against = (color, backgrounds) => Math.min(...backgrounds.map(backdrop => contrast(color, backdrop)));
-    return ['#result-heading','#delta','#rounding-residual','#messages .message','#document-state input:checked + .invoice-card','#basket-vat'].map(selector => {
+    return ['#result-heading','#delta','#rounding-residual','#messages .message','#document-state input:checked + .invoice-card','#positions [data-field=vat]','#positions .vat-draft:not([hidden])'].map(selector => {
       const element = document.querySelector(selector);
       const style = getComputedStyle(element);
       const focused = element.matches('.invoice-card') && document.activeElement === element.previousElementSibling;

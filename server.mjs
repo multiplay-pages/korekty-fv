@@ -6,8 +6,10 @@ import { resolve } from 'node:path';
 const routes=new Map([
   ['/',['index.html','text/html; charset=utf-8']],['/index.html',['index.html','text/html; charset=utf-8']],
   ['/styles.css',['styles.css','text/css; charset=utf-8']],['/app.mjs',['app.mjs','text/javascript; charset=utf-8']],
-  ...['calculator','basket','summary','examples','invoice-plan','daily-proration','billing-policy'].map(name=>[`/src/${name}.mjs`,[`src/${name}.mjs`,'text/javascript; charset=utf-8']]),
+  ...['calculator','basket','summary','examples','invoice-plan','billing-policy'].map(name=>[`/src/${name}.mjs`,[`src/${name}.mjs`,'text/javascript; charset=utf-8']]),
   ['/favicon.svg',['favicon.svg','image/svg+xml']],
+  // Logo jest plikiem lokalnym poza repozytorium (assets/ w .gitignore); gdy go brak, strona pokazuje napis.
+  ['/assets/logo_multiplay_new.svg',['assets/logo_multiplay_new.svg','image/svg+xml']],
 ]);
 export function createLocalServer() {
   const server=createServer(async(req,res)=>{

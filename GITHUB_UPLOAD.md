@@ -1,7 +1,12 @@
-# Pakiet do prywatnego repozytorium GitHub
+# Pakiet do repozytorium GitHub
 
-Ten katalog można w całości umieścić w **nowym prywatnym repozytorium**. Jest to lokalny
-prototyp kalkulatora korekt abonamentu 1/30; nie jest dopuszczony do użycia produkcyjnego.
+> **SUPERSEDED (CB-2026-11-25):** opis pakietu pochodzi z dawnej wersji. Obowiązuje wyłącznie
+> reguła CB-2026-11-25 opisana w `README.md`; wcześniejsze reguły są historyczne. Przed jakąkolwiek
+> publikacją repozytorium (push, Pages, zmiana widoczności) potrzebna jest osobna zgoda właściciela
+> i przegląd bramki publikacji (G-01).
+
+Ten katalog jest lokalnym prototypem kalkulatora korekt abonamentu (status TEST_ONLY); nie jest
+dopuszczony do użycia produkcyjnego.
 
 ## Co wysłać
 
@@ -35,7 +40,8 @@ Ekran będzie dostępny pod adresem `http://127.0.0.1:4173`.
 
 - Nie ma integracji z MMS, księgowością ani bazą danych.
 - Nie wpisuj danych rzeczywistych klientów do przykładów ani do zgłoszeń GitHub.
-- Obecna reguła nalicza obniżki i zakończenia według rzeczywistych dni / 30 po rabatach;
-  podwyżki zachowują osobną zasadę od kolejnego miesiąca.
+- Jedyną aktywną regułą obniżek i zakończeń w trakcie miesiąca jest CB-2026-11-25 (miesiące
+  28/29/30-dniowe: C, miesiąc 31-dniowy: B, jedna metoda dla całego koszyka). Podwyżki mają osobną
+  zasadę opisaną w `README.md`. Dawne reguły (MIN(A,B), rzeczywiste dni ÷ 30) są historyczne.
 - Przed użyciem produkcyjnym trzeba zamknąć opisane w README i `docs/` bramki
   prawno-księgowe, w tym D11.

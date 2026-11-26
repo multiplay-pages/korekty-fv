@@ -1,3 +1,5 @@
+> **SUPERSEDED (25.11.2026):** opisane tu reguły MIN(A,B) i/lub „rzeczywiste dni ÷ 30 dla wszystkich miesięcy” zostały zastąpione regułą CB-2026-11-25 (metoda C dla miesięcy 28/29/30-dniowych, B dla 31-dniowych). Dokument zachowano wyłącznie jako historię; nie służy jako specyfikacja obliczeń.
+
 # Etap 1 — plan zaakceptowany poleceniem „Rozpocznij etap 1 lokalnie”
 Cel: czysty silnik jednej zmiany, testy T01–T25 i sumaryczne kontrakty T26–T27.
 Wybór wykonawcy: JavaScript ESM, Node >=22, bez zależności. Brak repo i wdrożenia.

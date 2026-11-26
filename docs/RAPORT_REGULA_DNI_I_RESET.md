@@ -1,3 +1,5 @@
+> **SUPERSEDED (25.11.2026):** opisane tu reguły MIN(A,B) i/lub „rzeczywiste dni ÷ 30 dla wszystkich miesięcy” zostały zastąpione regułą CB-2026-11-25 (metoda C dla miesięcy 28/29/30-dniowych, B dla 31-dniowych). Dokument zachowano wyłącznie jako historię; nie służy jako specyfikacja obliczeń.
+
 # Etap 2 — rzeczywiste dni /30 i czytelny kalkulator
 
 13.11.2026. **Weryfikacja lokalna: PASS.** Wersja reguły0.2.0, prototyp TEST_ONLY.

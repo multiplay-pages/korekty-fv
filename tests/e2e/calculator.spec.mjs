@@ -1,6 +1,9 @@
 import { test as base, expect } from '@playwright/test';
 
-const APP_ORIGIN = new URL(process.env.BOK_E2E_URL || 'http://127.0.0.1:4173').origin;
+// Etykiety metody wg reguły CB-2026-11-25 (jedna metoda dla całego koszyka).
+const CB_C_LABEL = 'Reguła CB — miesiąc 28/29/30-dniowy: (stara cena × dni + nowa cena × dni) ÷ 30';
+const CB_B_LABEL = 'Reguła CB — miesiąc 31-dniowy: stara cena + (nowa − stara) × dni nowej ceny ÷ 30';
+const APP_ORIGIN =new URL(process.env.BOK_E2E_URL || 'http://127.0.0.1:4173').origin;
 
 // Every scenario also checks that the local calculator remains self-contained.
 const test = base.extend({
@@ -68,8 +71,9 @@ async function expectMoney(locator, amount, signed = false) {
   await expect(locator).toHaveText(new RegExp(`^\\s*${moneyPattern(amount, signed).source}\\s*$`));
 }
 
+// 26.11.2026: korekta prezentowana jako należność − F, więc zmniejszenie faktury ma znak minus.
 async function expectCorrectionAmount(page, amount) {
-  await expectMoney(page.locator('#delta'), amount, true);
+  await expectMoney(page.locator('#delta'), `-${amount}`, true);
 }
 
 async function expectParts(page, index, old, next) {
@@ -119,8 +123,7 @@ async function checkComplexity(page, selector) {
 }
 
 async function fillManualCase(page, overrides = {}) {
-  if (await page.locator('#bok-details').getAttribute('open') === null) await page.locator('#bok-details > summary').click();
-  await page.locator('#use-lines').check();
+  await page.locator('input[name=calc-mode][value=BOK]').check();
   const input = {
     month: '2026-11', effectiveDate: '2026-11-18',
     old: '150', new: '100', invoiced: '150', ...overrides,
@@ -180,8 +183,7 @@ test('starts with empty basket totals and optionally opens an editable row', asy
   await expect(positions(page)).toHaveCount(0);
   await expect(page.locator('#basket-old')).toBeVisible();
   await expect(page.locator('#position-editor')).toBeHidden();
-  await page.locator('#bok-details > summary').click();
-  await page.locator('#use-lines').check();
+  await page.locator('input[name=calc-mode][value=BOK]').check();
   await expect(positions(page)).toHaveCount(1);
   for (const field of ['old', 'new', 'invoiced']) {
     await expect(positionField(page, 0, field)).toHaveValue('');
@@ -212,13 +214,13 @@ test('calculates manually entered comma and dot amounts using the real form', as
   await calculate(page);
   await expectMoney(page.locator('#due'), '128.33');
   await expectCorrectionAmount(page, '1.67');
-  await expect(page.locator('#global-method')).toHaveText('Porównanie A/B — oba warianty są równe');
+  await expect(page.locator('#global-method')).toHaveText(CB_C_LABEL);
   await expect(page.locator('#days-old')).toHaveText('17');
   await expect(page.locator('#days-new')).toHaveText('13');
   await expect(page.locator('#days-month')).toHaveText('30');
   await expect(page.locator('#line-results tbody tr')).toHaveCount(1);
   await expectMoney(resultField(page, 0, 'due'), '128.33');
-  await expect(resultField(page, 0, 'delta')).toContainText(/\+1,67 zł/);
+  await expect(resultField(page, 0, 'delta')).toContainText(/−1,67 zł/);
   await expect(page.locator('#messages')).toContainText(/księgow/);
   await expectAccessibleControls(page);
 });
@@ -253,15 +255,16 @@ test('edycja rzeczywistej kwoty faktury dotyczy tylko wskazanej pozycji', async 
   await expect(positionField(page, 1, 'invoiced')).toHaveValue('50,00');
 });
 
+// Reguła CB-2026-11-25 (O = 150, N = 100, zmiana od 18. dnia → d = 17): L = 28/29/30 → C, L = 31 → B.
+// Wartości wyliczone ręcznie: C = (150 × 17 + 100 × r) ÷ 30; B = 150 + (100 − 150) × 14 ÷ 30.
 for (const scenario of [
-  { month: '2026-11', oldCharge: '85.00', newCharge: '43.33', due: '128.33', fraction:'17/30' },
+  { month: '2026-11', oldCharge: '85.00', newCharge: '43.33', due: '128.33', fraction:'(150,00 × 17 + 100,00 × 13) ÷ 30' },
   { month: '2027-03', oldCharge: '80.00', newCharge: '46.67', due: '126.67', fraction:'14/30' },
-  { month: '2027-02', oldCharge: '85.00', newCharge: '43.33', due: '128.33', fraction:'17/30' },
-  { month: '2028-02', oldCharge: '85.00', newCharge: '43.33', due: '128.33', fraction:'17/30' },
+  { month: '2027-02', oldCharge: '85.00', newCharge: '36.67', due: '121.67', fraction:'(150,00 × 17 + 100,00 × 11) ÷ 30' },
+  { month: '2028-02', oldCharge: '85.00', newCharge: '40.00', due: '125.00', fraction:'(150,00 × 17 + 100,00 × 12) ÷ 30' },
 ]) {
   test(`${scenario.month} pokazuje części i wzór zastosowanej metody w objaśnieniu`, async ({ page }) => {
     await fillManualCase(page, { month: scenario.month, effectiveDate: `${scenario.month}-18` });
-    await page.locator('#basket-vat').selectOption('23');
     await page.locator('#invoice-confirmed').check();
     await calculate(page);
     await page.locator('#calculation-details > summary').click();
@@ -276,10 +279,10 @@ for (const scenario of [
 }
 
 for (const fixture of [
-  { id: 'T01', due: '128.33', delta: '21.67', method: 'Porównanie A/B — wybrano A', days: [17, 11, 28] },
-  { id: 'T02', due: '128.33', delta: '21.67', method: 'Porównanie A/B — wybrano A', days: [17, 12, 29] },
-  { id: 'T03', due: '128.33', delta: '21.67', method: 'Porównanie A/B — oba warianty są równe', days: [17, 13, 30] },
-  { id: 'T08', due: '0.00', delta: '150.00', method: 'Porównanie A/B — wybrano B', days: [1, 30, 31] },
+  { id: 'T01', due: '121.67', delta: '28.33', method: CB_C_LABEL, days: [17, 11, 28] },
+  { id: 'T02', due: '125.00', delta: '25.00', method: CB_C_LABEL, days: [17, 12, 29] },
+  { id: 'T03', due: '128.33', delta: '21.67', method: CB_C_LABEL, days: [17, 13, 30] },
+  { id: 'T08', due: '0.00', delta: '150.00', method: CB_B_LABEL, days: [1, 30, 31] },
   { id: 'T18', due: '150.00', delta: '0.00', method: 'Podwyżka od następnego miesiąca', days: [31, 0, 31] },
 ]) {
   test(`${fixture.id} loads without calculating and preserves its calendar and amount result`, async ({ page }) => {
@@ -288,7 +291,8 @@ for (const fixture of [
     if (fixture.id === 'T18') {
       await expect(page.locator('#result-heading')).toHaveAttribute('data-result-state','NO_CORRECTION_EXPECTED');
       await expect(page.locator('#due')).toHaveCount(0);
-      await expect(page.locator('#next-month-label')).toHaveText('Abonament od 01.04.2027');
+      // P-08 / CB-2026-11-25: podwyżka od 1. dnia miesiąca → nowa cena obowiązuje od tego dnia (01.03.2027).
+      await expect(page.locator('#next-month-label')).toHaveText('Abonament od 01.03.2027');
       await expect(page.locator('#nominal-price')).toHaveText('180,00 zł');
       await expect(page.locator('#document-variants li')).toHaveCount(4);
       return;
@@ -309,14 +313,15 @@ test('two services share global B and show both directions and cent controls', a
   await loadExample(page, 'T26');
   await expect(positions(page)).toHaveCount(2);
   await calculate(page);
-  await expect(page.locator('#global-method')).toHaveText('Porównanie A/B — wybrano B');
+  await expect(page.locator('#global-method')).toHaveText(CB_B_LABEL);
   await expectMoney(page.locator('#due'), '140.67');
   await expectCorrectionAmount(page, '9.33');
   await expectMoney(resultField(page, 0, 'due'), '81.33');
   await expectMoney(resultField(page, 1, 'due'), '59.33');
-  await expect(resultField(page, 1, 'delta')).toContainText(/−9,33 zł/);
+  // TV: należność 59,33 > F 50,00 → korekta pozycji +9,33 (prezentacja należność − F).
+  await expect(resultField(page, 1, 'delta')).toContainText(/\+9,33 zł/);
   await expect(page.locator('#line-results thead th')).toHaveCount(4);
-  await expect(page.locator('#rounding-residual')).toHaveText('Reszta korekty koszyka −0,01 zł do uzgodnienia.');
+  await expect(page.locator('#rounding-residual')).toHaveText('Reszta korekty koszyka +0,01 zł do uzgodnienia.');
   await page.locator('#calculation-details > summary').click();
   await expectParts(page, 0, '53.33', '28.00');
   await expectParts(page, 1, '26.67', '32.67');
@@ -331,24 +336,26 @@ test('T27 requires review for changed components at the same total', async ({ pa
 
 test('podwyżka w dniu 1 i 2 zachowuje fakturę według O', async ({ page }) => {
   await fillManualCase(page, { month: '2027-03', effectiveDate: '2027-03-01', old: '150', new: '180' });
-  for (const lastOldDate of ['2027-02-28', '2027-03-01']) {
+  // P-08: dla zmiany od 1. dnia (ostatni dzień starych warunków 28.02) nowa cena obowiązuje od 01.03.2027;
+  // dla zmiany od 2. dnia (01.03) stara cena zostaje do końca marca, a nowa działa od 01.04.2027.
+  for (const [lastOldDate, newPriceFrom] of [['2027-02-28', '01.03.2027'], ['2027-03-01', '01.04.2027']]) {
     await page.locator('#last-old-date').fill(lastOldDate);
     await expectNoResult(page);
     await calculate(page);
     await expect(page.locator('#result-heading')).toHaveAttribute('data-result-state','NO_CORRECTION');
     await expect(page.locator('#due')).toHaveCount(0);
     await expect(page.locator('#result-main-amount')).toBeHidden();
-    await expect(page.locator('#next-month-label')).toHaveText('Abonament od 01.04.2027');
+    await expect(page.locator('#next-month-label')).toHaveText(`Abonament od ${newPriceFrom}`);
     await expectMoney(page.locator('#nominal-price'), '180.00');
     await expect(page.locator('#summary')).toHaveValue(/Faktura pozostaje: 150,00 zł/);
   }
 });
 
-test('różnica dodatnia jest zmniejszeniem, a F mniejsze od należności wymaga weryfikacji', async ({ page }) => {
+test('zmniejszenie faktury ma znak minus, a F mniejsze od należności wymaga weryfikacji', async ({ page }) => {
   await fillManualCase(page);
   await calculate(page);
   await expectCorrectionAmount(page,'21.67');
-  await expect(page.locator('#summary')).toHaveValue(/\+21,67 zł — zmniejszenie/);
+  await expect(page.locator('#summary')).toHaveValue(/Korekta faktury: −21,67 zł \(zmniejszenie\)/);
   await setInvoiceAmount(page, 0, '70');
   await expectReview(page, 'REVIEW', /Należność jest wyższa/);
   await expect(page.locator('#summary')).not.toHaveValue(/58,33 zł|Zwiększenie/i);
@@ -356,7 +363,6 @@ test('różnica dodatnia jest zmniejszeniem, a F mniejsze od należności wymaga
 
 test('zaokrąglenie nowej części do zera zachowuje jej okres w objaśnieniu', async ({ page }) => {
   await fillManualCase(page, { month: '2027-02', effectiveDate: '2027-02-18', old: '0.04', new: '0.01' });
-  await page.locator('#basket-vat').selectOption('23');
   await page.locator('#invoice-confirmed').check();
   await calculate(page);
   await page.locator('#calculation-details > summary').click();
@@ -448,19 +454,17 @@ test('rejects malformed money instead of coercing or rounding the input', async 
   }
 });
 
-test('blocks net amounts, mixed VAT, multiple dates and unresolved discounts', async ({ page }) => {
+test('blocks net amounts, multiple dates and unresolved discounts (mixed VAT no longer blocks)', async ({ page }) => {
   for (const scenario of [
     { name: 'net basis', mutate: () => setMetadata(page, 0, 'basis', 'net'), message: /BASIS|netto|brutto|net/i },
-    { name: 'mixed VAT', mutate: () => setMetadata(page, 1, 'vat', '8'), message: /VAT|stawk/i },
 
     { name: 'multiple dates', mutate: () => checkComplexity(page, '#multiple-dates'), message: /kilka|wiel|dat/i },
     { name: 'unresolved discounts', mutate: () => checkComplexity(page, '#unresolved-discounts'), message: /DISCOUNT|rabat|nieroz/i },
   ]) {
     await test.step(scenario.name, async () => {
       await loadExample(page, 'T26');
-      await page.locator('#basket-vat').selectOption('23');
       await scenario.mutate();
-      await expectReview(page, ['net basis','mixed VAT'].includes(scenario.name) ? 'REVIEW' : 'REFER', scenario.message);
+      await expectReview(page, scenario.name === 'net basis' ? 'REVIEW' : 'REFER', scenario.message);
     });
   }
 });
@@ -527,7 +531,8 @@ test('reset clears the complete case, invoice overrides, warnings and results', 
   }
   await expect(page.locator('#event-type')).toHaveCount(0);
   await expect(page.locator('#document-state input:checked')).toHaveValue('UNKNOWN');
-  await expect(page.locator('#bok-details')).not.toHaveAttribute('open', '');
+  await expect(page.locator('#bok-details')).toBeHidden();
+  await expect(page.locator('input[name=calc-mode][value=SUD]')).toBeChecked();
   await expectNoResult(page);
   await expect(page.locator('#errors')).not.toContainText(/\S/);
   await expect(page.locator('#copy-feedback')).not.toContainText(/\S/);
@@ -545,7 +550,7 @@ async function prepareSafeSummary(page) {
   const summary = await summaryField.inputValue();
   expect(summary).toMatch(/03\.2027/);
   expect(summary).toMatch(/18\.03\.2027/);
-  expect(summary).toMatch(/0\.5\.0-test-min-ab/);
+  expect(summary).toMatch(/0\.6\.0-test-cb-2026-11-25/);
   expect(summary).toMatch(/TEST_ONLY/);
   for (const amount of ['150.00', '130.00', '140.67', '9.33']) expect(summary).toMatch(moneyPattern(amount));
   expect(summary).toMatch(/weryfikacja księgowa|D11/i);
@@ -600,7 +605,8 @@ test('supports keyboard activation and keeps meaningful focus on controls', asyn
   await expect(page.locator('#basket-old')).toHaveValue(/150(?:[.,]00)?/);
   await page.locator('#basket-invoiced').focus();
   await page.keyboard.press('Tab');
-  await expect(page.locator('#bok-details > summary')).toBeFocused();
+  // Tryb SUD: sekcja pozycji BOK jest ukryta, więc Tab przechodzi do „Sprawa nietypowa”.
+  await expect(page.locator('.complexity > summary')).toBeFocused();
   await page.locator('#calculate').focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('#result-heading')).toBeFocused();

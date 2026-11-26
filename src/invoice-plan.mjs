@@ -8,7 +8,6 @@ const round30=value=>value<0n?-((-value+15n)/30n):(value+15n)/30n;
 
 /** Przyjmuje wyłącznie zweryfikowany wynik evaluateBasket(). Wszystkie kwoty PLN. */
 export function buildInvoicePlan(result) {
-  if(result.rule==='ACTUAL_DAYS_OVER_30_AFTER_DISCOUNTS')return result.invoicePlan;
   const g=result.global, first=`${result.month}-01`;
   const date=day=>`${result.month}-${String(day).padStart(2,'0')}`;
   const calendarOld=g.daysOld?{from:first,to:date(g.daysOld),days:g.daysOld}:null;
@@ -29,7 +28,8 @@ export function buildInvoicePlan(result) {
   if(g.method==='Pełna O'){oldUnits=30;newUnits=0;}
   else if(g.method==='Pełna N'){oldUnits=0;newUnits=30;}
   else if(g.method==='B'){oldUnits=30-g.daysNew;newUnits=g.daysNew;}
-  else {oldUnits=g.daysOld;newUnits=30-g.daysOld;}
+  else if(g.method==='C'){oldUnits=g.daysOld;newUnits=g.daysNew;} // CB: C=(O×d+N×r)/30, d+r=L
+  else {oldUnits=g.daysOld;newUnits=30-g.daysOld;} // historyczne A / A=B
   let total=0n,rowResidualSum=0n;
   const rows=result.rows.map(row=>{
     const old=toCents(row.old),next=toCents(row.new),invoiced=toCents(row.invoiced);
@@ -50,7 +50,7 @@ export function buildInvoicePlan(result) {
   const totalResidual=BigInt(g.dueCents)-total;
   return {...common,available:true,status:'TEST_ONLY_D11_OPEN',oldUnits,newUnits,rows,
     fullMonthlyPolicy:g.method.startsWith('Pełna'),
-    adjustedModel:!g.method.startsWith('Pełna')&&g.daysInMonth!==30,
+    adjustedModel:g.method!=='C'&&!g.method.startsWith('Pełna')&&g.daysInMonth!==30,
     partsTotal:amount(total),totalResidual:amount(totalResidual),rowResidualSum:amount(rowResidualSum),
     needsRoundingReview:result.residual!=='0.00'||rows.some(row=>row.partResidual!=='0.00'),
   };

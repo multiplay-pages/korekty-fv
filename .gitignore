@@ -1,0 +1,21 @@
+# Zależności i artefakty uruchomień (nigdy nie trafiają do repozytorium)
+node_modules/
+output/
+test-results/
+playwright-report/
+
+# Lokalne logi i zrzuty wyników. Plik już śledzony nie przestaje być śledzony — to sprawa osobnej decyzji (G-01).
+*.log
+*.tap
+
+# Instrukcje lokalne narzędzi AI i katalogi robocze (zawierają prywatne ścieżki i kontekst)
+/CLAUDE.md
+/AGENTS.md
+.claude/
+
+# Materiały wewnętrzne: raporty robocze i plany pomocnicze nie należą do publicznego repozytorium
+docs/RAPORT_*.md
+docs/superpowers/
+
+# Logo i inne materiały marki — tylko lokalnie, do czasu osobnej zgody na publikację
+/assets/

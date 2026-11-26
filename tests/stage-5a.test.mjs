@@ -72,8 +72,8 @@ for (const [id, other] of [
 }
 
 for (const [id, signs, remainder, remainderLabel] of [
-  ['M24', ['9.33','0.00','9.33','0.00'], '0.01', 'Reszta korekty koszyka +0,01 zł do uzgodnienia.'],
-  ['R2a-ujemny-wiersz', ['18.67','-9.33'], '-0.01', 'Reszta korekty koszyka −0,01 zł do uzgodnienia.'],
+  ['M24', ['9.33','0.00','9.33','0.00'], '0.01', 'Reszta korekty koszyka −0,01 zł do uzgodnienia.'],
+  ['R2a-ujemny-wiersz', ['18.67','-9.33'], '-0.01', 'Reszta korekty koszyka +0,01 zł do uzgodnienia.'],
 ]) {
   test(`5A ${id} Q-02–Q-04: rzeczywiste znaki i reszta`, () => {
     const input = matrix.find(([candidate]) => id === candidate)[1];
@@ -118,6 +118,7 @@ test('5A A5 i A6: pierwszego dnia podwyżki 150 i 180 pozostają, a 165 trafia d
   for (const [invoiced,decision,variants] of [[undefined,'NO_CORRECTION_EXPECTED',4],['150','NO_CORRECTION',0],
     ['180','NO_CORRECTION',0],['165','REVIEW',0]]) {
     const result = evaluateCorrection({...input,totals:{old:'150',new:'180',invoiced}});
-    assert.deepEqual([result.decision,result.effectiveBillingDate,result.correctionAmount,result.variants.length], [decision,'2027-04-01',null,variants]);
+    // P-08: cena N obowiązuje od dnia 1 (T = 2027-03-01); decyzje o fakturze bez zmian.
+    assert.deepEqual([result.decision,result.effectiveBillingDate,result.correctionAmount,result.variants.length,result.amountDue], [decision,'2027-03-01',null,variants,'180.00']);
   }
 });

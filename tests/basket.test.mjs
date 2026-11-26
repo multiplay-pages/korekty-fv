@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { evaluateBasket } from '../src/basket.mjs';
-import { buildSummary } from '../src/summary.mjs';
+import { buildResultPresentation, copyResultPresentation } from '../src/summary.mjs';
+import { evaluateCorrection } from '../src/billing-policy.mjs';
 
 const row = (old = '100', next = '60', invoiced = old) => ({ label: 'I-01', description: 'Opis wewnętrzny', service: 'internet', old, new: next, invoiced, basis: 'gross', vat: '' });
 const t26 = { month: '2027-03', effectiveDate: '2027-03-18', type: 'DOWNGRADE', dateVerified: true, multipleDates: false, unresolvedDiscounts: false, rows: [row(), { ...row('50','70'), service: 'tv' }] };
@@ -50,23 +51,24 @@ for(const f of fixtures) test(`${f.id}: cienki adapter zachowuje zgodność siln
   assert.equal(r.rows[0].due,f.expected.due);
   assert.equal(r.residual,'0.00');
 });
-test('wspólne A=B w miesiącu30 rozpisuje równe metody, a suma jest dokładna',()=>{
+test('wspólne C w miesiącu30 (CB-2026-11-25), suma dokładna, reszta jawna',()=>{
   const r=evaluateBasket({...t26,month:'2026-11',effectiveDate:'2026-11-18'});
-  assert.equal(r.global.method,'A=B');
+  assert.equal(r.global.method,'C');
   assert.equal(r.global.due,'141.33');
   assert.deepEqual(r.rows.map(x=>x.due),['82.67','58.67']);
   assert.equal(r.residual,'-0.01');
 });
-test('kopiowany tekst ma kwoty, daty, wiersze i status; pomija wszystkie wolne teksty',()=>{
-  const r=evaluateBasket({...t26,rows:[{...row(),label:'Jan Kowalski',description:'PESEL 12345678901'},row('50','70')]});
-  const text=buildSummary(r);
+test('kopia z formularza ma kwoty, daty, pozycje i status; pomija wszystkie wolne teksty',()=>{
+  const line=(service,old,next,fields={})=>({service,old,new:next,invoiced:old,basis:'gross',vat:'23',...fields});
+  const r=evaluateCorrection({month:'2027-03',lastOldDate:'2027-03-17',dateVerified:true,source:'lines',totals:{},documentState:'AMOUNT',invoiceConfirmed:true,
+    rows:[line('internet','100','60',{label:'Jan Kowalski',description:'PESEL 12345678901'}),line('tv','50','70')]});
+  const text=copyResultPresentation(buildResultPresentation(r));
   assert.match(text,/18\.03\.2027/);
   assert.match(text,/140,67 zł/);
   assert.match(text,/\+9,33 zł/);
-  assert.match(text,/Pozycja 1/);
+  assert.match(text,/1\. Internet/);
   assert.match(text,/D11/);
-  assert.match(text,/PROPOZYCJA TESTOWA/);
-  assert.match(text,/nieprzypisan/i);
+  assert.match(text,/TEST_ONLY/);
   assert.doesNotMatch(text,/Jan|Kowalski|PESEL|12345678901/);
 });
 test('duże sumy, brak mutacji, wynik można serializować',()=>{
@@ -95,3 +97,17 @@ for(const [name,patch,code] of [
   ['brak potwierdzenia',{dateVerified:false},'DATE_NOT_VERIFIED'],
   ['niezgodny kierunek',{type:'PODWYŻKA'},'DIRECTION_MISMATCH'],
 ]) test(`blokada koszyka: ${name}`,()=>assert.throws(()=>evaluateBasket({...t26,...patch}),e=>e.code===code));
+
+test('słownik usług BOK: 15 usług z domyślnym VAT (decyzja 26.11.2026); stawki niejednoznaczne oznaczone jako robocze', async () => {
+  const { SERVICE_CATALOG, SERVICES } = await import('../src/basket.mjs');
+  const vat = Object.fromEntries(Object.values(SERVICE_CATALOG).map(({ label, vat }) => [label, vat]));
+  assert.deepEqual(vat, {
+    'Internet': '23', 'Telewizja': '8', 'Telefon': '23', 'Multiroom': '8', 'CANAL+ — pakiety kanałów': '8',
+    'Dodatkowy pakiet TV': '8', 'Jeszcze Raz / PVR': '8', 'Wi-Fi Premium / MESH': '23', 'Internet Plus / stały IP': '23',
+    'Internet symetryczny': '23', 'Bezpieczny Internet': '23', 'Utrzymanie linii': '23', 'Dzierżawa urządzenia': '23',
+    'VOD — odrębna usługa': '23', 'Inna usługa': '23',
+  });
+  assert.deepEqual(Object.values(SERVICE_CATALOG).filter(item => item.draft).map(item => item.label),
+    ['Multiroom', 'Jeszcze Raz / PVR', 'Dzierżawa urządzenia', 'VOD — odrębna usługa', 'Inna usługa']);
+  assert.equal(SERVICES.internet, 'Internet');
+});

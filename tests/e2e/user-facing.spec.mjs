@@ -20,12 +20,12 @@ test('lutowe wyjaśnienie pokazuje automatycznie dobrany sposób i konkretne dzi
   await page.locator('#example-select').selectOption('FEB_CHANGE');
   await page.locator('#load-example').click();
   await page.locator('#calculate').click();
-  await expect(page.locator('#due')).toHaveText('82,00 zł');
+  await expect(page.locator('#due')).toHaveText('76,67 zł');
   await page.locator('.method-details > summary').click();
-  await expect(page.locator('#global-method')).toHaveText('Porównanie A/B — wybrano A');
-  await expect(page.locator('#calculation-steps')).toContainText('80,00 + (100,00 − 80,00) × 3/30 = 82,00 zł');
+  await expect(page.locator('#global-method')).toHaveText('Reguła CB — miesiąc 28/29/30-dniowy: (stara cena × dni + nowa cena × dni) ÷ 30');
+  await expect(page.locator('#calculation-steps')).toContainText('(100,00 × 3 + 80,00 × 25) ÷ 30 = 76,67 zł');
   await expect(page.locator('.method-details input, .method-details select')).toHaveCount(0);
-  await expect(page.locator('#summary')).toHaveValue(/\+18,00 zł — zmniejszenie/);
+  await expect(page.locator('#summary')).toHaveValue(/Korekta faktury: −23,33 zł \(zmniejszenie\)/);
 });
 test('reset formularza usuwa także błędy i zmienione opcje rozliczenia',async({page})=>{
   await page.locator('#training-mode').check();
@@ -39,7 +39,8 @@ test('reset formularza usuwa także błędy i zmienione opcje rozliczenia',async
   await page.locator('#calculate').click();await expect(page.locator('#result-heading')).toHaveAttribute('data-result-state','REFER');
   await page.locator('#reset').click();
   await expect(page.locator('#positions tbody tr')).toHaveCount(0);
-  await expect(page.locator('#use-lines')).not.toBeChecked();
+  await expect(page.locator('#bok-details')).toBeHidden();
+  await expect(page.locator('input[name=calc-mode][value=SUD]')).toBeChecked();
   await expect(page.locator('#basket-invoiced')).toHaveValue('');
   for(const id of ['multiple-dates','unresolved-discounts'])await expect(page.locator(`#${id}`)).not.toBeChecked();
   await expect(page.locator('#example-select')).toHaveValue('');
@@ -78,5 +79,5 @@ test('Nowa sprawa przy wyniku przywraca cały początkowy ekran i pozwala liczy�
   await expect(page.locator('#results')).toBeHidden();await expect(page.locator('#copy-summary')).toBeDisabled();
   await page.locator('#training-mode').check();
   await page.locator('#example-select').selectOption('FEB_CHANGE');await page.locator('#load-example').click();await page.locator('#calculate').click();
-  await expect(page.locator('#due')).toHaveText(/82,00\s+zł/);
+  await expect(page.locator('#due')).toHaveText(/76,67\s+zł/);
 });
