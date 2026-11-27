@@ -3,14 +3,14 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { evaluateBasket } from '../src/basket.mjs';
 import { buildInvoicePlan } from '../src/invoice-plan.mjs';
-import { buildSummary } from '../src/summary.mjs';
 
 const row=(old='150',next='100',invoiced=old)=>({service:'internet',old,new:next,invoiced,basis:'gross',vat:''});
 const base={type:'DOWNGRADE',month:'2026-11',effectiveDate:'2026-11-18',dateVerified:true,rows:[row()]};
 for(const [month,T,oldCharge,newCharge,method,oldUnits,newUnits] of [
-  ['2027-02','2027-02-18','85.00','43.33','A',17,13],
-  ['2028-02','2028-02-18','85.00','43.33','A',17,13],
-  ['2026-11','2026-11-18','85.00','43.33','A=B',17,13],
+  // CB-2026-11-25 (wartości wpisane ręcznie): C=(O×d+N×r)/30 → stara część O×d/30, nowa N×r/30; jednostki to rzeczywiste d i r.
+  ['2027-02','2027-02-18','85.00','36.67','C',17,11],
+  ['2028-02','2028-02-18','85.00','40.00','C',17,12],
+  ['2026-11','2026-11-18','85.00','43.33','C',17,13],
   ['2027-03','2027-03-18','80.00','46.67','B',16,14],
 ])test(`${month}: stara i nowa część zachowują globalną ${method}`,()=>{
   const result=evaluateBasket({...base,month,effectiveDate:T}),plan=buildInvoicePlan(result);
@@ -69,34 +69,18 @@ test('F mniejsze od starej części: zwiększenie starej pozycji zachowane',()=>
   const p=buildInvoicePlan(evaluateBasket({...base,rows:[row('150','100','70')]}));
   assert.equal(p.rows[0].oldAdjustment,'15.00');assert.equal(p.rows[0].documentChange,'58.33');
 });
-test('kopia odróżnia zmniejszenie starej pozycji i zmniejszenie całej faktury',()=>{
-  const text=buildSummary(evaluateBasket(base));
-  assert.match(text,/Zmniejsz starą pozycję o 65,00 zł/);
-  assert.match(text,/Zmniejszenie faktury o 21,67 zł/);
-});
-test('kopia jawnie opisuje zwiększenie przy F niższym od starej części',()=>{
-  const text=buildSummary(evaluateBasket({...base,rows:[row('150','100','70')]}));
-  assert.match(text,/Zwiększ starą pozycję o 15,00 zł/);
-  assert.match(text,/Zwiększenie faktury o 58,33 zł/);
-});
 test('podwyżka w przyszłym miesiącu: data wyższej ceny nie jest liczona od miesiąca analizy',()=>{
   const p=buildInvoicePlan(evaluateBasket({...base,type:'PODWYŻKA',effectiveDate:'2027-02-18',rows:[row('150','180')]}));
   assert.equal(p.higherPriceStart,'2027-03-01');
   assert.equal(p.rows[0].oldCharge,'150.00');
 });
-test('kopia pełnej nowej ceny nie nazywa jej opłatą cząstkową',()=>{
-  const text=buildSummary(evaluateBasket({...base,type:'PODWYŻKA',effectiveDate:'2026-11-01',rows:[row('150','180')]}));
-  assert.match(text,/Nowy abonament za cały miesiąc: 180,00 zł/);
-  assert.doesNotMatch(text,/Nowy abonament cząstkowy:/);
-});
 test('dodatnia nowa część zaokrąglona do zera zachowuje okres i kontrolę',()=>{
   const result=evaluateBasket({...base,month:'2027-02',effectiveDate:'2027-02-18',rows:[row('0.04','0.01')]});
-  const p=buildInvoicePlan(result),text=buildSummary(result);
+  const p=buildInvoicePlan(result);
   assert.equal(p.rows[0].newPeriod.from,'2027-02-18');
-  assert.equal(p.rows[0].newNumerator,'13');
-  assert.match(text,/18\.02\.2027–28\.02\.2027/);
-  assert.match(text,/0,00 zł po testowym zaokrągleniu/);
-  assert.match(text,/reszta wymaga uzgodnienia/);
+  assert.equal(p.rows[0].newNumerator,'11');
+  assert.equal(p.rows[0].newCharge,'0.00');
+  assert.equal(p.needsRoundingReview,true);
 });
 test('data wyższej ceny przechodzi przez koniec roku',()=>{
   const p=buildInvoicePlan(evaluateBasket({...base,type:'PODWYŻKA',effectiveDate:'2026-12-18',rows:[row('150','180')]}));

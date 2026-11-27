@@ -1,15 +1,11 @@
 import { evaluateBasket, parseAmount, formatAmount, SERVICES } from './basket.mjs';
-import { evaluateDailyBasket } from './daily-proration.mjs';
 import { buildInvoicePlan } from './invoice-plan.mjs';
 
-export const LEGACY_MIN_AB_TEST_POLICY = Object.freeze({ version: '0.3.0-test-min-ab', partialRule: 'MIN_AB' });
-export const BASELINE_DEMO_POLICY = Object.freeze({
-  version: '0.4.0-test-min-ab', partialRule: 'MIN_AB', deferAllIncreases: true, assumeMissingInvoice: true,
-});
+// Jedyna polityka: reguła CB-2026-11-25 (28/29/30 dni → C, 31 dni → B, jedna metoda dla koszyka; podwyżka od dnia 1 → pełna N).
+// Dawne reguły (MIN(A,B), rzeczywiste dni ÷ 30) usunięto z kodu; inna wartość partialRule daje POLICY_UNRESOLVED.
 export const ACTIVE_DEMO_POLICY = Object.freeze({
-  version: '0.5.0-test-min-ab', partialRule: 'MIN_AB', deferAllIncreases: true,
+  version: '0.6.0-test-cb-2026-11-25', rule: 'CB-2026-11-25', partialRule: 'CB', assumeMissingInvoice: true,
 });
-export const ACTUAL_DAYS_TEST_POLICY = Object.freeze({ version: '0.3.0-test-actual-days', partialRule: 'ACTUAL_DAYS' });
 
 const moneyFields = ['old', 'new', 'invoiced'];
 const vatCategories = ['', '23', '8', '5', '0', 'zw'];
@@ -24,9 +20,17 @@ const reasons = {
   R04: 'Zmiana nastąpi po analizowanym miesiącu. Za cały analizowany miesiąc obowiązuje dotychczasowy abonament.',
   R05: 'Cena i skład koszyka się nie zmieniły. Należność to pełny abonament.',
   R06: 'Za miesiąc zmiany obowiązuje dotychczasowy abonament. Wyższa cena jest naliczana od pierwszego dnia następnego miesiąca.',
-  R07: 'Obniżenie w trakcie miesiąca rozliczono automatycznie według reguły testowej dla całego koszyka.',
-  R08: 'Należność po zakończeniu usługi ustalono według reguły testowej i ostatniego dnia świadczenia.',
+  R07: 'Obniżenie w trakcie miesiąca rozliczono automatycznie jedną metodą dla całego koszyka (reguła CB-2026-11-25).',
+  R08: 'Należność po zakończeniu usługi ustalono według reguły CB-2026-11-25 i ostatniego dnia świadczenia.',
 };
+
+/** Dni naliczenia podwyżki wynikają z daty naliczania nowej ceny (nie z podziału kalendarzowego po dacie zdarzenia T). */
+function increaseBillingDays(month, daysInMonth, billingDate) {
+  if (!billingDate) return null;
+  if (billingDate <= `${month}-01`) return { daysOld: 0, daysNew: daysInMonth };
+  if (billingDate > `${month}-${String(daysInMonth).padStart(2, '0')}`) return { daysOld: daysInMonth, daysNew: 0 };
+  return null;
+}
 
 function fail(code, message, field) {
   throw Object.assign(new Error(message), { code, field });
@@ -175,8 +179,8 @@ function evaluateLegacyCorrection(input, policy) {
   try {
     const { form, source, taxReview, originalRows, vatUnknown, invoiceAssumed = false } = validateInput(input, policy);
     const type = form.type ?? inferEvent(form.rows);
-    const historical = evaluateBasket({ ...form, type });
-    const { old, new: next, invoiced } = historical.totals;
+    const result = evaluateBasket({ ...form, type });
+    const { old, new: next, invoiced } = result.totals;
     const directions = originalRows?.map(row => parseAmount(row.new) - parseAmount(row.old)) ?? [];
     const oppositeChanges = directions.some(value => value < 0n) && directions.some(value => value > 0n);
     if (old === next && (input.componentsChanged || directions.some(value => value !== 0n))) {
@@ -188,23 +192,15 @@ function evaluateLegacyCorrection(input, policy) {
     if (oppositeChanges && type !== 'DOWNGRADE') {
       fail('OPPOSING_LINE_CHANGES', 'Ceny pozycji zmieniają się w różnych kierunkach. Przekaż sprawę do rozliczeń.', 'rows');
     }
-    const increaseDeferred = type === 'PODWYŻKA' && (policy?.deferAllIncreases || !form.effectiveDate.endsWith('-01'));
+    // Podwyżka w trakcie miesiąca: nowa cena od pierwszego dnia następnego miesiąca.
+    const increaseDeferred = type === 'PODWYŻKA' && !form.effectiveDate.endsWith('-01');
     const effectiveBillingDate = type === 'NO_CHANGE' ? null
       : increaseDeferred ? nextMonthStart(form.effectiveDate.slice(0, 7)) : form.effectiveDate;
     if (type === 'PODWYŻKA' && !effectiveBillingDate) fail('INVALID_DATE', 'Data naliczania podwyżki wykracza poza obsługiwany kalendarz.', 'lastOldDate');
 
-    const ruleId = classify(historical, type, effectiveBillingDate);
+    const ruleId = classify(result, type, effectiveBillingDate);
     const partial = ruleId === 'R07' || ruleId === 'R08';
-    // Datę umowną sprawdzono powyżej. Dni i części faktury dla podwyżki wyznacza data naliczania.
-    let result = increaseDeferred && policy?.deferAllIncreases
-      ? evaluateBasket({ ...form, type, effectiveDate: effectiveBillingDate, lastOldDate: undefined })
-      : historical;
-    if (partial && partialRule === 'ACTUAL_DAYS') {
-      if (source !== 'lines' && historical.global.daysInMonth !== 30 && next !== '0.00') {
-        fail('LINES_NEEDED', 'Do tej kalkulacji potrzebne są pozycje, aby wyodrębnić abonamenty, które nie zmieniły ceny.', 'rows');
-      }
-      result = evaluateDailyBasket({ ...form, type });
-    } else if (partial && partialRule !== 'MIN_AB') {
+    if (partial && partialRule !== 'CB') {
       fail('POLICY_UNRESOLVED', 'Brak reguły testowej dla części tego miesiąca. Przekaż sprawę do rozliczeń.', 'type');
     }
 
@@ -230,14 +226,16 @@ function evaluateLegacyCorrection(input, policy) {
       else if (effectiveBillingDate <= nextMonth) nextMonthAmount = next;
     }
     const endDescription = next === '0.00' && type !== 'NO_CHANGE' && result.global.daysOld === 0
-      ? 'Od początku analizowanego miesiąca abonament wynosi 0,00 zł.'
-      : reasons[ruleId];
+      ? 'Od początku analizowanego miesiąca abonament wynosi 0,00 zł.' : reasons[ruleId];
+    // Dni naliczenia podwyżki odpowiadają polityce cenowej: T = 1. dnia → cała nowa cena, inaczej cała stara w miesiącu zmiany.
+    const billing = type === 'PODWYŻKA' ? increaseBillingDays(result.month, result.global.daysInMonth, effectiveBillingDate) : null;
+    const global = billing ? { ...result.global, ...billing } : result.global;
 
     return {
-      ...result, status: 'TEST_ONLY', policyVersion, ruleId,
+      ...result, global, status: 'TEST_ONLY', policyVersion, ruleId,
       effectiveDate: form.effectiveDate, lastOldDate: form.lastOldDate ?? '',
-      calculationReason: endDescription, appliedMethod: result.global.method,
-      daysInMonth: result.global.daysInMonth, daysOld: result.global.daysOld, daysNew: result.global.daysNew,
+      calculationReason: endDescription, appliedMethod: global.method,
+      daysInMonth: global.daysInMonth, daysOld: global.daysOld, daysNew: global.daysNew,
       oldMonthlyAmount: old, newMonthlyAmount: next, invoicedAmount: invoiced,
       amountDue: result.global.due, invoiceDifference: result.global.delta, invoiceAssumed,
       assumedInvoiceRows: rows.filter(row => row.invoiceAssumed).length,
@@ -276,18 +274,15 @@ function collectProtectedInput(input) {
     fail('INCONSISTENT_DATES', 'Pierwszy dzień nowych warunków musi następować po ostatnim dniu starej ceny.', 'lastOldDate');
   }
   const source = input.source ?? 'aggregate';
-  const totals = input.totals ?? {};
   const isBok = source === 'lines';
   if (!isBok && source !== 'aggregate') fail('INVALID_INPUT', 'Wybierz źródło danych do kalkulacji.', 'source');
-  const entries = isBok ? input.rows : [aggregateRow(totals)];
+  const entries = isBok ? input.rows : [aggregateRow(input.totals ?? {})];
   if (!Array.isArray(entries) || !entries.length) fail('ROWS_REQUIRED', 'Dodaj przynajmniej jedną pozycję.', 'rows');
   if (entries.length > 50) fail('ROW_LIMIT', 'Kalkulator obsługuje maksymalnie 50 pozycji.', 'rows');
   const documentState = input.documentState ?? (entries.some(row => hasAmount(row?.invoiced) && !row?.invoiceAssumed) ? 'AMOUNT' : 'UNKNOWN');
   if (!documentStates.has(documentState)) fail('INVALID_DOCUMENT_STATE', 'Wybierz stan faktury.', 'documentState');
   const invoiceEntered = documentState === 'AMOUNT';
-  const basketVat = input.basketVat ?? '';
-  if (!vatCategories.includes(basketVat)) fail('INVALID_VAT', 'Wybierz stawkę VAT koszyka.', 'basketVat');
-  const vats = new Set(basketVat ? [basketVat] : []);
+  const vats = new Set();
   const rowChanges = [];
   let old = 0n, next = 0n, invoiced = 0n;
   let amountsComplete = invoiceEntered;
@@ -316,7 +311,7 @@ function collectProtectedInput(input) {
     next += rowNext;
     invoiced += rowInvoice;
     rowChanges.push(rowNext - rowOld);
-    return { id, label, description, service, basis: 'gross', vat: basketVat,
+    return { id, label, description, service, basis: 'gross', vat,
       old: row.old, new: newPrice, invoiced: formatAmount(rowInvoice) };
   });
   const type = input.type ?? (next > old ? 'PODWYŻKA' : next < old ? 'DOWNGRADE' : 'NO_CHANGE');
@@ -330,16 +325,10 @@ function collectProtectedInput(input) {
   }
   if (input.paid !== undefined && input.paid !== '') parseAmount(input.paid, 'paid');
   if ([old, next, invoiced].some(value => value > 99999999999999999n)) fail('TOTAL_TOO_LARGE', 'Suma koszyka przekracza limit 15 cyfr w złotych.', 'rows');
-  if (isBok && scopeSupported) {
-    for (const [key, value] of [['old', old], ['new', next], ['invoiced', amountsComplete ? invoiced : null]]) {
-      if (value !== null && hasAmount(totals[key]) && parseAmount(totals[key], `totals.${key}`) !== value) {
-        fail('TOTAL_MISMATCH', 'Wpisana suma brutto różni się od sumy pozycji.', `totals.${key}`);
-      }
-    }
-  }
+  // BOK liczy O, N i F wyłącznie z pozycji; sumy koszyka (SUD) nie biorą udziału w wyniku ani w kontrolach (26.11.2026).
   const changeMonth = effectiveDate.slice(0, 7);
   const monthRelation = input.month < changeMonth ? 'BEFORE' : input.month > changeMonth ? 'AFTER' : 'CHANGE';
-  return { rows, source, type, effectiveDate, monthRelation, documentState, amountsComplete, basketVat,
+  return { rows, source, type, effectiveDate, monthRelation, documentState, amountsComplete,
     old, next, invoiced, isBok, scopeSupported, mixedVat: vats.size > 1, rowChanges };
 }
 
@@ -371,6 +360,7 @@ function evaluateProtectedCorrection(input) {
     status: 'TEST_ONLY', accountingAllowed: false, policyVersion: ACTIVE_DEMO_POLICY.version,
     documentState: 'UNKNOWN', dataStatus: 'MISSING', correctionAmount: null, correctionRemainder: null,
     amountDue: null, invoicedAmount: null, lineBreakdown: [], variants: [], warnings: [],
+    rowsDueTotal: null, dueRemainder: null, contractPrice: null,
     confirmation: { allowed: false, reason: 'Uzupełnij wymagane dane.' },
   };
   const outcome = ([decision, code, calculationReason], field) => ({ ...result, decision, code, calculationReason, field });
@@ -394,7 +384,6 @@ function evaluateProtectedCorrection(input) {
   ].find(([flag]) => flag);
   if (exceptional) return outcome(['REFER', ...exceptional.slice(1)]);
   if (!data.scopeSupported) return outcome(['REVIEW', 'UNSUPPORTED_SCOPE', 'Kalkulacja obejmuje B2C i porównywalne kwoty brutto. Przekaż sprawę do weryfikacji.']);
-  if (data.mixedVat) return outcome(['REVIEW', 'MIXED_VAT', 'Koszyk zawiera różne stawki VAT. Przekaż sprawę do weryfikacji.']);
   if (next === old && (input.componentsChanged || data.rowChanges.some(value => value !== 0n))) {
     return outcome(['REVIEW', 'COMPONENTS_CHANGED_SAME_TOTAL', 'Ceny lub skład koszyka zmieniły się przy tej samej sumie. Uzgodnij rozliczenie (D11).']);
   }
@@ -404,8 +393,9 @@ function evaluateProtectedCorrection(input) {
   }
 
   if (isBok) {
-    result.confirmation = { allowed: amountsComplete && Boolean(data.basketVat), reason: !amountsComplete
-      ? 'Wpisz rzeczywistą kwotę z faktury dla każdej pozycji.' : !data.basketVat ? 'Wskaż jedną stawkę VAT całego koszyka.' : '' };
+    const vatComplete = data.rows.every(row => row.vat);
+    result.confirmation = { allowed: amountsComplete && vatComplete, reason: !amountsComplete
+      ? 'Wpisz rzeczywistą kwotę z faktury dla każdej pozycji.' : !vatComplete ? 'Wybierz stawkę VAT każdej pozycji.' : '' };
   }
   const assumed = !isBok && documentState === 'UNKNOWN' && monthRelation === 'CHANGE' && old !== next;
   const invoice = amountsComplete || assumed ? invoiced : null;
@@ -414,9 +404,11 @@ function evaluateProtectedCorrection(input) {
     : amountsComplete ? 'ENTERED' : assumed ? 'ASSUMED' : 'MISSING';
   const normalized = { source: data.source, month: input.month, lastOldDate: input.lastOldDate, effectiveDate,
     dateVerified: true, paid: input.paid, type: data.type };
-  if (isBok) normalized.rows = data.rows;
+  // VAT pozycji nie wpływa na obliczenie brutto (C/B); mieszany VAT daje wyłącznie wynik poglądowy brutto (D11 otwarte).
+  if (isBok) normalized.rows = data.rows.map(row => ({ ...row, vat: '' }));
   else normalized.totals = { old: formatAmount(old), new: formatAmount(next), invoiced: formatAmount(invoiced) };
-  const calculated = evaluateLegacyCorrection(normalized, BASELINE_DEMO_POLICY);
+  // Aktywna ścieżka UI liczy wyłącznie według polityki CB (P-05: wcześniej była tu na stałe zaszyta polityka historyczna).
+  const calculated = evaluateLegacyCorrection(normalized, ACTIVE_DEMO_POLICY);
   if (calculated.status !== 'TEST_ONLY') {
     result.confirmation = { allowed: false, reason: 'Sprawdź dane koszyka.' };
     result.dataStatus = amountsComplete ? 'ENTERED' : 'MISSING';
@@ -433,13 +425,23 @@ function evaluateProtectedCorrection(input) {
     if (['LINE_INCREASE_REVIEW', 'NEGATIVE_LINE_PROPOSAL', 'UNALLOCATED_ROUNDING'].includes(code)) return resolution[0] === 'CORRECTION';
     return !['ADDITIONAL_AMOUNT_REVIEW', 'VAT_UNKNOWN'].includes(code);
   });
+  if (data.mixedVat) result.warnings.push('MIXED_VAT_GROSS_ONLY');
   if (resolution[0] === 'CORRECTION') {
     result.correctionAmount = formatAmount(invoice - due);
-    result.lineBreakdown = calculated.rows;
+    result.lineBreakdown = calculated.rows.map((row, index) => ({ ...row, vat: data.rows[index].vat }));
     if (isBok) {
+      // Dwie niezależne reszty (bez automatycznej alokacji groszy, D11 otwarte):
+      // reszta należności = należność koszyka − suma należności pozycji; reszta korekty = (F − należność) − suma różnic pozycji.
+      result.rowsDueTotal = calculated.rowSum;
+      result.dueRemainder = calculated.residual;
       result.correctionRemainder = formatAmount(invoice - due - BigInt(calculated.rowDeltaSum.replace('.', '')));
       result.parts = calculated.plan;
     }
+  }
+  // Cena umowna za analizowany miesiąc przy podwyżce (osobno od kwoty faktury i od abonamentu w kolejnych miesiącach).
+  // Ustalona tylko wtedy, gdy kalkulacja się odbyła; przy REFER/ERROR/REVIEW bez kwot wcześniej zwrócono wynik bez tej wartości.
+  if (data.type === 'PODWYŻKA' && monthRelation === 'CHANGE') {
+    result.contractPrice = calculated.daysNew === calculated.daysInMonth ? formatAmount(next) : formatAmount(old);
   }
   if (documentState === 'UNKNOWN' && monthRelation === 'CHANGE' && effectiveDate.endsWith('-01') && old !== next) {
     const observed = (key, value) => {

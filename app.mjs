@@ -1,4 +1,4 @@
-import { formatPln, formatDate, SERVICE_GROUPS } from './src/basket.mjs';
+import { formatPln, formatDate, SERVICE_CATALOG } from './src/basket.mjs';
 import { ACTIVE_DEMO_POLICY, evaluateCorrection, nextCalendarDay, summarizeGrossRows } from './src/billing-policy.mjs';
 import { buildResultPresentation, copyResultPresentation } from './src/summary.mjs';
 import { example } from './src/examples.mjs';
@@ -44,7 +44,7 @@ function setDocumentState(value) {
 
 function resultPill(label, tone) {
   const pill = document.createElement('span');
-  pill.className = 'result-pill';
+  pill.className = 'pill';
   pill.setAttribute('aria-hidden', 'true');
   pill.dataset.tone = tone;
   pill.textContent = label;
@@ -54,13 +54,14 @@ function resultPill(label, tone) {
 function clientNote(decision) {
   return 'Dla klienta: ' + clientNotes[decision];
 }
-const serviceOptions = Object.entries(SERVICE_GROUPS).map(([group, services]) => {
-  const options = Object.entries(services).map(([key, label]) => `<option value="${key}">${label}</option>`).join('');
-  return `<optgroup label="${group}">${options}</optgroup>`;
-}).join('');
+const serviceOptions = Object.entries(SERVICE_CATALOG).map(([key, { label }]) => `<option value="${key}">${label}</option>`).join('');
+const vatOptions = [['23', '23%'], ['8', '8%'], ['5', '5%'], ['0', '0%'], ['zw', 'zw.']]
+  .map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
 const problemFlags = ['multiple-dates', 'unresolved-discounts', 'non-comparable', 'components-changed', 'date-uncertain'];
-let comparingTotals = false;
 let monthEdited = false, aggregateDocumentState = 'UNKNOWN', linesDocumentState = 'UNKNOWN';
+// Tryb ustawia wyłącznie przełącznik SUD/BOK (rozwijanie paneli go nie zmienia). SUD = sumy koszyka, BOK = pozycje.
+// Przy przełączaniu oba zestawy danych zostają w formularzu; żaden tryb nie nadpisuje kwot drugiego.
+let bokMode = false;
 
 function readRows() {
   return Array.from(tbody.rows, tr => ({
@@ -79,17 +80,33 @@ function updateGrossSums() {
 }
 
 function syncSource() {
-  const lines = $('use-lines').checked;
-  $('derived-overview').hidden = !lines;
-  $('aggregate-invoice-field').hidden = lines && !comparingTotals;
+  const lines = bokMode;
+  form.elements['calc-mode'].value = lines ? 'BOK' : 'SUD';
+  $('bok-details').hidden = !lines;
+  text('complexity-step', lines ? '3' : '2');
+  $('aggregate-invoice-field').hidden = lines;
   $('position-editor').hidden = !lines;
-  $('declared-note').hidden = !lines;
-  $('aggregate-values').hidden = lines && !comparingTotals;
-  $('toggle-declared').setAttribute('aria-expanded', String(lines && comparingTotals));
-  text('toggle-declared', comparingTotals ? 'Ukryj sumy wpisane do porównania' : 'Pokaż sumy wpisane do porównania');
+  $('aggregate-values').hidden = lines;
   text('source-status', lines
-    ? 'Źródło kalkulacji: pozycje BOK. Wcześniej wpisane sumy brutto służą do porównania.'
-    : 'Źródło kalkulacji: kwoty całego koszyka. Wpisane pozycje pozostają zapisane w formularzu do końca sprawy.');
+    ? 'Źródło kalkulacji: pozycje BOK.'
+    : tbody.rows.length
+      ? 'Źródło kalkulacji: kwoty całego koszyka. Wpisane pozycje BOK pozostają zapisane w formularzu do końca sprawy.'
+      : 'Źródło kalkulacji: kwoty całego koszyka.');
+}
+
+function setBokMode(lines) {
+  if (lines === bokMode) return false;
+  bokMode = lines;
+  if (lines && !tbody.rows.length) addRow();
+  setDocumentState(lines ? linesDocumentState : aggregateDocumentState);
+  syncSource();
+  return true;
+}
+
+function syncServiceVat(row, resetVat) {
+  const service = SERVICE_CATALOG[row.querySelector('[data-field="service"]').value];
+  if (resetVat) row.querySelector('[data-field="vat"]').value = service.vat;
+  row.querySelector('.vat-draft').hidden = !service.draft;
 }
 
 function syncDocumentFields() {
@@ -111,9 +128,10 @@ function datePreviews() {
   restore.textContent = manual ? `Wróć do ${formatPeriod(suggested)}` : '';
   const month = $('month').value;
   const preview = validMonth(month) ? polishMonth.format(new Date(month + '-01T00:00:00Z')) : '';
-  text('month-preview', manual ? preview + ' · Miesiąc zmieniono ręcznie.' : preview);
+  text('month-preview', manual ? preview + ' · Miesiąc zmieniono ręcznie.' : '');
+  text('invoice-month-label', preview ? `· ${preview}` : '');
   const change = nextCalendarDay($('last-old-date').value);
-  text('date-preview', change ? `Zmiana warunków od ${formatDate(change)}.` : '');
+  text('date-preview', change ? `Nowe warunki od ${formatDate(change)}` : '');
 }
 
 function updateConfirmation() {
@@ -132,6 +150,11 @@ function invalidate(message='Dane zmienione — oblicz ponownie, aby otrzymać a
   if (clearConfirmation) $('invoice-confirmed').checked = false;
   $('results').hidden = true;
   $('result-empty').hidden = false;
+  // Karty poza ciemnym panelem (założenie faktury, rozbicie usług, ostrzeżenia) dotyczą tylko aktualnego wyniku.
+  $('result-pill').hidden = true;
+  text('invoiced-source', '');
+  $('bok-result').hidden = true;
+  $('warning-details').hidden = true;
   $('copy-preview').open = false;
   $('result-heading').removeAttribute('data-result-state');
   $('summary').value = '';
@@ -156,31 +179,33 @@ function addRow(values={}) {
   tr.dataset.rowId = String(id);
   const fields=[
     ['Pozycja / usługa',`<select data-field="service" aria-label="Usługa pozycji ${id}">${serviceOptions}</select>`],
+    ['VAT',`<select data-field="vat" aria-label="Stawka VAT pozycji ${id}" aria-describedby="vat-draft-${id}">${vatOptions}</select><small id="vat-draft-${id}" class="tiny vat-draft" hidden>robocza — sprawdź w MMS</small>`],
     ...[['old','Dotychczasowy abonament miesięczny'],['new','Nowy abonament miesięczny']].map(([key,label])=>[label,`<input data-field="${key}" inputmode="decimal" type="text" maxlength="64" aria-label="${label} pozycji ${id}" placeholder="0,00 zł" required>`]),
     ['Na fakturze',`<input data-field="invoiced" inputmode="decimal" type="text" maxlength="64" aria-label="Kwota na fakturze pozycji ${id}" placeholder="0,00 zł">`],
-    ['Szczegóły',`<details class="row-meta"><summary>Dane pozycji</summary><label>Opcjonalna nazwa<input data-field="label" type="text" maxlength="160" aria-label="Nazwa pozycji ${id}" placeholder="Nazwa pozycji (opcjonalna)"></label><label>Podstawa<select data-field="basis" aria-label="Podstawa pozycji ${id}"><option value="gross">Brutto</option><option value="net">Netto</option></select></label><label>VAT (informacja)<select data-field="vat" aria-label="VAT pozycji ${id}"><option value="">Nieokreśl.</option><option value="23">23%</option><option value="8">8%</option><option value="5">5%</option><option value="0">0%</option><option value="zw">Zw.</option></select></label></details>`],
+    ['Szczegóły',`<details class="row-meta"><summary>Dane pozycji</summary><label>Opcjonalna nazwa<input data-field="label" type="text" maxlength="160" aria-label="Nazwa pozycji ${id}" placeholder="Nazwa pozycji (opcjonalna)"></label><label>Podstawa<select data-field="basis" aria-label="Podstawa pozycji ${id}"><option value="gross">Brutto</option><option value="net">Netto</option></select></label></details>`],
     ['',`<button type="button" class="remove-row" data-action="remove" aria-label="Usuń pozycję ${id}">×</button>`],
   ];
   for(const [label,markup] of fields) { const td=document.createElement('td'); td.dataset.label=label; td.innerHTML=markup; tr.append(td); }
   for(const input of tr.querySelectorAll('[data-field]')) {
     if(values[input.dataset.field]!==undefined) input.value=values[input.dataset.field];
   }
+  syncServiceVat(tr, !values.vat);
   tbody.append(tr); updateCount();
 }
 function readForm() {
   return {
-    source: $('use-lines').checked ? 'lines' : 'aggregate',
+    source: bokMode ? 'lines' : 'aggregate',
     month: $('month').value,
     lastOldDate: $('last-old-date').value,
-    totals: {
+    // Każdy tryb przekazuje wyłącznie własne dane: SUD — sumy koszyka, BOK — pozycje.
+    totals: bokMode ? {} : {
       old: normalizeMoney($('basket-old').value),
       new: normalizeMoney($('basket-new').value),
       invoiced: normalizeMoney($('basket-invoiced').value),
     },
-    rows: readRows(),
+    rows: bokMode ? readRows() : [],
     documentState: documentStateControl().value,
     invoiceConfirmed: $('invoice-confirmed').checked,
-    basketVat: $('use-lines').checked ? $('basket-vat').value : '',
     scope: $('billing-scope').value,
     dateVerified: !$('date-uncertain').checked,
     multipleDates: $('multiple-dates').checked,
@@ -204,10 +229,6 @@ const problemField = {
 
 function revealField(field) {
   if (!field) return;
-  if (field.closest('#aggregate-values')) {
-    comparingTotals = true;
-    syncSource();
-  }
   for (let details = field.closest('details'); details; details = details.parentElement.closest('details')) details.open = true;
 }
 
@@ -222,9 +243,8 @@ function errorField(result) {
   const rowField = group === 'rows' && index !== undefined
     ? tbody.rows[Number(index)]?.querySelector(`[data-field="${key}"]`) : null;
   return rowField ?? (group === 'totals' ? $(`basket-${index}`)
-    : group === 'rows' ? $('use-lines')
+    : group === 'rows' ? $('add-position')
     : group === 'lastOldDate' ? $('last-old-date')
-    : group === 'basketVat' ? $('basket-vat')
     : group === 'documentState' ? documentStateControl()
     : $(problemField[result.code] ?? 'calculate'));
 }
@@ -320,6 +340,14 @@ function renderBreakdown(view) {
       }
     }
   }
+  // Uzgodnienie groszowe: należność koszyka, suma należności pozycji i reszta należności (osobno od reszty korekty).
+  const reconciliation = $('reconciliation-lines');
+  reconciliation.replaceChildren(...view.reconciliation.map(line => {
+    const item = document.createElement('li');
+    item.textContent = line;
+    return item;
+  }));
+  $('reconciliation-row').hidden = !view.reconciliation.length;
   $('remainder-row').hidden = !view.remainder;
   text('rounding-residual', view.remainder);
 }
@@ -331,19 +359,29 @@ function render(result) {
   heading.dataset.dataStatus = result.dataStatus;
   heading.dataset.documentState = result.documentState;
   text('result-heading', view.title);
-  const tone = result.dataStatus === 'CONFIRMED' && result.decision === 'CORRECTION' ? 'success'
-    : ['REVIEW', 'REFER', 'INVOICE_REQUIRED'].includes(result.decision) ? 'caution' : 'info';
-  $('result-pill').replaceWith(Object.assign(resultPill(view.title, tone), { id: 'result-pill' }));
+  const correction = result.decision === 'CORRECTION';
+  const confirmed = result.dataStatus === 'CONFIRMED';
+  const tone = confirmed && correction ? 'success'
+    : ['REVIEW', 'REFER', 'INVOICE_REQUIRED'].includes(result.decision) ? 'caution'
+    : correction ? 'warning' : 'neutral';
+  // Przy korekcie główną informacją są kwoty (jak w makiecie); nagłówek pozostaje dla czytników ekranu i fokusu.
+  heading.classList.toggle('sr-only', correction);
+  const pill = $('result-pill');
+  pill.hidden = false;
+  pill.dataset.tone = tone;
+  pill.textContent = correction ? (confirmed ? '✓ Faktura potwierdzona' : '⚠ Szacunek · faktura niepotwierdzona') : view.title;
   text('client-note', clientNote(tone === 'success' ? 'CONFIRMED' : result.decision));
   text('result-period', view.dateDetails);
   text('delta-explanation', view.message);
   text('invoiced-source', view.dataNote);
   text('delta', view.amount ?? '');
+  text('delta-label', confirmed ? 'Korekta faktury' : 'Szacunkowa korekta faktury');
   $('result-main-amount').hidden = view.amount === null;
+  $('main-amount-box').hidden = view.amount === null;
 
-  const fields = $('result-fields');
+  const fields = $('result-fields'), stack = $('price-stack');
   fields.replaceChildren();
-  fields.hidden = !view.fields.length;
+  stack.replaceChildren($('main-amount-box'));
   for (const { id, label, value } of view.fields) {
     const group = document.createElement('div');
     const term = document.createElement('dt');
@@ -351,13 +389,23 @@ function render(result) {
     term.id = id === 'nominal-price' ? 'next-month-label' : `${id}-label`;
     term.textContent = id === 'due' && result.type === 'PODWYŻKA'
       ? 'Abonament za ' + polishMonth.format(new Date(result.month + '-01T00:00:00Z')) : label;
-    if ((id === 'due' && result.decision === 'INVOICE_REQUIRED')
-      || (id === 'result-invoiced' && result.decision === 'NO_CORRECTION')) group.classList.add('featured-amount');
     definition.id = id;
     definition.textContent = value;
     group.append(term, definition);
-    fields.append(group);
+    // Kwota kluczowa dla decyzji trafia do dużego pola obok kwoty zmniejszenia; pozostałe — do wierszy podsumowania.
+    const featured = (id === 'due' && (correction || result.decision === 'INVOICE_REQUIRED'))
+      || (id === 'result-invoiced' && result.decision === 'NO_CORRECTION');
+    if (featured) {
+      const box = document.createElement('dl');
+      box.className = 'price-box';
+      box.append(group);
+      stack.append(box);
+    } else {
+      fields.append(group);
+    }
   }
+  fields.hidden = !fields.childElementCount;
+  stack.hidden = !stack.querySelector('.price-box:not([hidden])');
 
   const variants = $('document-variants');
   variants.replaceChildren();
@@ -379,7 +427,6 @@ function render(result) {
     return item;
   }));
   $('warning-details').hidden = !list.childElementCount;
-  $('warning-details').open = false;
   $('summary').value = copyResultPresentation(view);
   $('copy-summary').disabled = !view.copyAllowed;
   text('copy-scope', view.rows.length && !view.copyRows ? 'Kopia obejmuje wynik koszyka. Pozycje będą dostępne po potwierdzeniu danych.' : '');
@@ -397,7 +444,7 @@ function render(result) {
 }
 
 function saveDocumentState() {
-  if ($('use-lines').checked) linesDocumentState = documentStateControl().value;
+  if (bokMode) linesDocumentState = documentStateControl().value;
   else aggregateDocumentState = documentStateControl().value;
 }
 
@@ -411,13 +458,14 @@ function changed(event) {
     $('load-example').disabled = !target.value;
     return;
   }
-  if (target === $('month')) monthEdited = true;
-  if (target === $('use-lines')) {
-    if (target.checked && !tbody.rows.length) addRow();
-    if (!target.checked) comparingTotals = false;
-    setDocumentState(target.checked ? linesDocumentState : aggregateDocumentState);
-    syncSource();
+  if (target.name === 'calc-mode') {
+    // Zmiana trybu: dane zostają, ale poprzedni wynik, kopia i potwierdzenie faktury są unieważniane.
+    setBokMode(target.value === 'BOK');
+    invalidate();
+    return;
   }
+  if (target === $('month')) monthEdited = true;
+  if (target.matches('[data-field="service"]')) syncServiceVat(target.closest('tr'), true);
   if (target.matches('#basket-invoiced, [data-field="invoiced"]') && target.value.trim()) setDocumentState('AMOUNT');
   saveDocumentState();
   invalidate(undefined, target !== $('invoice-confirmed'));
@@ -490,10 +538,6 @@ form.addEventListener('submit', event => {
   render(result);
 });
 
-$('toggle-declared').addEventListener('click', () => {
-  comparingTotals = !comparingTotals;
-  syncSource();
-});
 function appendPosition(field) {
   addRow();
   invalidate();
@@ -522,8 +566,8 @@ tbody.addEventListener('click', event => {
 });
 
 function clearBasket() {
-  for (const id of [...problemFlags, 'use-lines', 'invoice-confirmed']) $(id).checked = false;
-  $('basket-vat').value = '';
+  for (const id of [...problemFlags, 'invoice-confirmed']) $(id).checked = false;
+  bokMode = false;
   $('billing-scope').value = 'B2C';
   setDocumentState('UNKNOWN');
   aggregateDocumentState = 'UNKNOWN';
@@ -535,7 +579,6 @@ function clearBasket() {
     input.readOnly = false;
     input.disabled = false;
   }
-  comparingTotals = false;
   tbody.replaceChildren();
   nextRowId = 1;
   updateCount();
@@ -550,9 +593,8 @@ $('load-example').addEventListener('click', () => {
   $('last-old-date').value = data.lastOldDate;
   monthEdited = data.month !== proposedMonth();
   if (data.rows.length > 1) {
-    $('use-lines').checked = true;
-    $('bok-details').open = true;
     for (const row of data.rows) addRow(row);
+    setBokMode(true);
     setDocumentState('AMOUNT');
   } else {
     const { old, new: next, invoiced } = data.rows[0];
@@ -598,6 +640,10 @@ $('copy-summary').addEventListener('click',async()=>{
   }
 });
 text('policy-version', ACTIVE_DEMO_POLICY.version);
+// Logo jest plikiem lokalnym (nie trafia do repozytorium). Bez niego nagłówek pokazuje napis MULTIPLAY.
+const logo = $('brand-logo');
+const logoMissing = () => logo.closest('.hero-logo').classList.add('no-logo');
+if (logo.complete && !logo.naturalWidth) logoMissing(); else logo.addEventListener('error', logoMissing);
 syncSource();
 datePreviews();
 syncDocumentFields();

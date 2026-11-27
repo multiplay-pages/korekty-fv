@@ -1,0 +1,359 @@
+{
+  "policy": "CB-2026-11-25",
+  "units": "integer cents",
+  "cases": [
+    {
+      "id": "T01",
+      "month": "2027-02",
+      "daysInMonth": 28,
+      "daysOld": 17,
+      "daysNew": 11,
+      "oldCents": 15000,
+      "newCents": 10000,
+      "invoicedCents": 15000,
+      "expected": {
+        "method": "C",
+        "dueCents": 12167,
+        "deltaCents": 2833
+      },
+      "effectiveDate": "2027-02-18",
+      "lastOldDate": "2027-02-17"
+    },
+    {
+      "id": "T02",
+      "month": "2028-02",
+      "daysInMonth": 29,
+      "daysOld": 17,
+      "daysNew": 12,
+      "oldCents": 15000,
+      "newCents": 10000,
+      "invoicedCents": 15000,
+      "expected": {
+        "method": "C",
+        "dueCents": 12500,
+        "deltaCents": 2500
+      },
+      "effectiveDate": "2028-02-18",
+      "lastOldDate": "2028-02-17"
+    },
+    {
+      "id": "T03",
+      "month": "2026-11",
+      "daysInMonth": 30,
+      "daysOld": 17,
+      "daysNew": 13,
+      "oldCents": 15000,
+      "newCents": 10000,
+      "invoicedCents": 15000,
+      "expected": {
+        "method": "C",
+        "dueCents": 12833,
+        "deltaCents": 2167
+      },
+      "effectiveDate": "2026-11-18",
+      "lastOldDate": "2026-11-17"
+    },
+    {
+      "id": "T04",
+      "month": "2027-03",
+      "daysInMonth": 31,
+      "daysOld": 17,
+      "daysNew": 14,
+      "oldCents": 15000,
+      "newCents": 10000,
+      "invoicedCents": 15000,
+      "expected": {
+        "method": "B",
+        "dueCents": 12667,
+        "deltaCents": 2333
+      },
+      "effectiveDate": "2027-03-18",
+      "lastOldDate": "2027-03-17"
+    },
+    {
+      "id": "T12",
+      "month": "2027-02",
+      "daysInMonth": 28,
+      "daysOld": 27,
+      "daysNew": 1,
+      "oldCents": 15000,
+      "newCents": 10000,
+      "invoicedCents": 15000,
+      "expected": {
+        "method": "C",
+        "dueCents": 13833,
+        "deltaCents": 1167
+      },
+      "effectiveDate": "2027-02-28",
+      "lastOldDate": "2027-02-27"
+    },
+    {
+      "id": "T24",
+      "month": "2028-02",
+      "daysInMonth": 29,
+      "daysOld": 28,
+      "daysNew": 1,
+      "oldCents": 15000,
+      "newCents": 10000,
+      "invoicedCents": 15000,
+      "expected": {
+        "method": "C",
+        "dueCents": 14333,
+        "deltaCents": 667
+      },
+      "effectiveDate": "2028-02-29",
+      "lastOldDate": "2028-02-28"
+    },
+    {
+      "id": "END-28",
+      "month": "2027-02",
+      "daysInMonth": 28,
+      "daysOld": 17,
+      "daysNew": 11,
+      "oldCents": 15000,
+      "newCents": 0,
+      "invoicedCents": 15000,
+      "expected": {
+        "method": "C",
+        "dueCents": 8500,
+        "deltaCents": 6500
+      },
+      "effectiveDate": "2027-02-18",
+      "lastOldDate": "2027-02-17"
+    },
+    {
+      "id": "END-29",
+      "month": "2028-02",
+      "daysInMonth": 29,
+      "daysOld": 17,
+      "daysNew": 12,
+      "oldCents": 15000,
+      "newCents": 0,
+      "invoicedCents": 15000,
+      "expected": {
+        "method": "C",
+        "dueCents": 8500,
+        "deltaCents": 6500
+      },
+      "effectiveDate": "2028-02-18",
+      "lastOldDate": "2028-02-17"
+    },
+    {
+      "id": "END-30",
+      "month": "2026-11",
+      "daysInMonth": 30,
+      "daysOld": 17,
+      "daysNew": 13,
+      "oldCents": 15000,
+      "newCents": 0,
+      "invoicedCents": 15000,
+      "expected": {
+        "method": "C",
+        "dueCents": 8500,
+        "deltaCents": 6500
+      },
+      "effectiveDate": "2026-11-18",
+      "lastOldDate": "2026-11-17"
+    },
+    {
+      "id": "END-31",
+      "month": "2027-03",
+      "daysInMonth": 31,
+      "daysOld": 17,
+      "daysNew": 14,
+      "oldCents": 15000,
+      "newCents": 0,
+      "invoicedCents": 15000,
+      "expected": {
+        "method": "B",
+        "dueCents": 8000,
+        "deltaCents": 7000
+      },
+      "effectiveDate": "2027-03-18",
+      "lastOldDate": "2027-03-17"
+    },
+    {
+      "id": "T08",
+      "month": "2027-03",
+      "daysInMonth": 31,
+      "daysOld": 1,
+      "daysNew": 30,
+      "oldCents": 15000,
+      "newCents": 0,
+      "invoicedCents": 15000,
+      "expected": {
+        "method": "B",
+        "dueCents": 0,
+        "deltaCents": 15000
+      },
+      "effectiveDate": "2027-03-02",
+      "lastOldDate": "2027-03-01"
+    },
+    {
+      "id": "100-80-28",
+      "month": "2027-02",
+      "daysInMonth": 28,
+      "daysOld": 3,
+      "daysNew": 25,
+      "oldCents": 10000,
+      "newCents": 8000,
+      "invoicedCents": 10000,
+      "expected": {
+        "method": "C",
+        "dueCents": 7667,
+        "deltaCents": 2333
+      },
+      "effectiveDate": "2027-02-04",
+      "lastOldDate": "2027-02-03"
+    },
+    {
+      "id": "100-80-29",
+      "month": "2028-02",
+      "daysInMonth": 29,
+      "daysOld": 3,
+      "daysNew": 26,
+      "oldCents": 10000,
+      "newCents": 8000,
+      "invoicedCents": 10000,
+      "expected": {
+        "method": "C",
+        "dueCents": 7933,
+        "deltaCents": 2067
+      },
+      "effectiveDate": "2028-02-04",
+      "lastOldDate": "2028-02-03"
+    },
+    {
+      "id": "100-80-30",
+      "month": "2026-11",
+      "daysInMonth": 30,
+      "daysOld": 3,
+      "daysNew": 27,
+      "oldCents": 10000,
+      "newCents": 8000,
+      "invoicedCents": 10000,
+      "expected": {
+        "method": "C",
+        "dueCents": 8200,
+        "deltaCents": 1800
+      },
+      "effectiveDate": "2026-11-04",
+      "lastOldDate": "2026-11-03"
+    },
+    {
+      "id": "100-80-31",
+      "month": "2027-03",
+      "daysInMonth": 31,
+      "daysOld": 3,
+      "daysNew": 28,
+      "oldCents": 10000,
+      "newCents": 8000,
+      "invoicedCents": 10000,
+      "expected": {
+        "method": "B",
+        "dueCents": 8133,
+        "deltaCents": 1867
+      },
+      "effectiveDate": "2027-03-04",
+      "lastOldDate": "2027-03-03"
+    },
+    {
+      "id": "CB-UNCHANGED-ROW",
+      "month": "2027-02",
+      "daysInMonth": 28,
+      "daysOld": 3,
+      "daysNew": 25,
+      "oldCents": 10000,
+      "newCents": 8000,
+      "invoicedCents": 10000,
+      "expected": {
+        "method": "C",
+        "dueCents": 7667,
+        "deltaCents": 2333,
+        "residualCents": 1
+      },
+      "rows": [
+        {
+          "oldCents": 6000,
+          "newCents": 4000,
+          "invoicedCents": 6000,
+          "expectedDueCents": 3933
+        },
+        {
+          "oldCents": 4000,
+          "newCents": 4000,
+          "invoicedCents": 4000,
+          "expectedDueCents": 3733
+        }
+      ],
+      "effectiveDate": "2027-02-04",
+      "lastOldDate": "2027-02-03"
+    },
+    {
+      "id": "T26",
+      "month": "2027-03",
+      "daysInMonth": 31,
+      "daysOld": 17,
+      "daysNew": 14,
+      "oldCents": 15000,
+      "newCents": 13000,
+      "invoicedCents": 15000,
+      "expected": {
+        "method": "B",
+        "dueCents": 14067,
+        "deltaCents": 933,
+        "residualCents": 1
+      },
+      "rows": [
+        {
+          "oldCents": 10000,
+          "newCents": 6000,
+          "invoicedCents": 10000,
+          "expectedDueCents": 8133
+        },
+        {
+          "oldCents": 5000,
+          "newCents": 7000,
+          "invoicedCents": 5000,
+          "expectedDueCents": 5933
+        }
+      ],
+      "effectiveDate": "2027-03-18",
+      "lastOldDate": "2027-03-17"
+    },
+    {
+      "id": "CB-F-NE-O",
+      "month": "2027-02",
+      "daysInMonth": 28,
+      "daysOld": 17,
+      "daysNew": 11,
+      "oldCents": 15000,
+      "newCents": 10000,
+      "invoicedCents": 13000,
+      "expected": {
+        "method": "C",
+        "dueCents": 12167,
+        "deltaCents": 833
+      },
+      "effectiveDate": "2027-02-18",
+      "lastOldDate": "2027-02-17"
+    },
+    {
+      "id": "CB-F-ZERO",
+      "month": "2027-02",
+      "daysInMonth": 28,
+      "daysOld": 17,
+      "daysNew": 11,
+      "oldCents": 15000,
+      "newCents": 10000,
+      "invoicedCents": 0,
+      "expected": {
+        "method": "C",
+        "dueCents": 12167,
+        "deltaCents": -12167
+      },
+      "effectiveDate": "2027-02-18",
+      "lastOldDate": "2027-02-17"
+    }
+  ]
+}

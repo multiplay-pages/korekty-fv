@@ -1,5 +1,5 @@
 // Wyłącznie dane syntetyczne z testów referencyjnych; brak cen ofertowych klientów.
-const line=(service,old,next,invoiced=old)=>({label:service==='tv'?'TV-02':'INT-01',description:service==='tv'?'Abonament telewizyjny':'Abonament internetowy',service,old,new:next,invoiced,basis:'gross',vat:''});
+const line=(service,old,next,invoiced=old)=>({label:service==='tv'?'TV-02':'INT-01',description:service==='tv'?'Abonament telewizyjny':'Abonament internetowy',service,old,new:next,invoiced,basis:'gross'});
 const common={month:'2027-03',lastOldDate:'2027-03-17'};
 export function example(id) {
   switch(id) {

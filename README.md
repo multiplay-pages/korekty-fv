@@ -29,13 +29,15 @@ Przykład „Faktura wyższa od dotychczasowego abonamentu” daje należność 
 
 ## Reguły demonstratora
 
-`src/billing-policy.mjs` udostępnia `evaluateCorrection(input, policy)`. Formularz wywołuje resolver z wbudowaną polityką **`0.4.0-test-min-ab`**. Dane obejmują źródło `aggregate` lub `lines`, miesiąc (`YYYY-MM`), ostatni dzień starych warunków (`YYYY-MM-DD`), ceny O i N, opcjonalne F i pozycje i informacje o niejednoznacznościach. Rezultat zawiera status, regułę, uzasadnienie, kwoty i flagę dopuszczenia księgowego.
+Jedyną aktywną regułą naliczania obniżek i zakończeń w trakcie miesiąca jest CB-2026-11-25. Wcześniejsze reguły mają status historyczny (SUPERSEDED).
+
+`src/billing-policy.mjs` udostępnia `evaluateCorrection(input, policy)`. Formularz wywołuje resolver z wbudowaną polityką **`0.6.0-test-cb-2026-11-25`** (reguła CB-2026-11-25). Dane obejmują źródło `aggregate` lub `lines`, miesiąc (`YYYY-MM`), ostatni dzień starych warunków (`YYYY-MM-DD`), ceny O i N, opcjonalne F i pozycje i informacje o niejednoznacznościach. Rezultat zawiera status, regułę, uzasadnienie, kwoty i flagę dopuszczenia księgowego.
 
 - Zmiany przed miesiącem lub od pierwszego dnia dają pełny nowy abonament dla obniżki. Zmiany po miesiącu zachowują pełny dotychczasowy abonament.
-- Podwyżka, także przy zmianie warunków pierwszego dnia, jest naliczana od pierwszego dnia miesiąca następującego po miesiącu zmiany. Kwota za miesiąc zmiany pozostaje dotychczasowa.
-- Obniżenie lub zakończenie w trakcie miesiąca używa globalnego MIN(A,B) z dokładnym porównaniem przed zaokrągleniem. Dla każdej pozycji stosuje się ten sam wariant. Różnica faktury to F − należność.
-- Profil `0.3.0-test-actual-days` pozostaje dostępny w wywołaniach deweloperskich. Przykład zmiany ze 100 zł na 80 zł od 4 lutego 2027 daje **82,00 zł** w aktywnym profilu, a przy rzeczywistych dniach **76,67 zł**. Oba silniki mają osobną regresję.
-- Na poziomie BOK testowe rozbicie pokazuje kwotę docelową, różnicę oraz reszty groszowe. D11 pozostaje otwarte. Przy mieszanym VAT lub kwotach netto można uzyskać poglądowy wynik zbiorczy na podstawie niezależnie potwierdzonych sum brutto. W innych złożonych przypadkach kalkulator kieruje do weryfikacji.
+- Podwyżka od pierwszego dnia miesiąca jest naliczana według nowej ceny już za ten miesiąc. Podwyżka w trakcie miesiąca zostawia dotychczasową cenę za miesiąc zmiany, a nowa cena obowiązuje od pierwszego dnia miesiąca następnego. Decyzje dotyczące faktury po podwyżce pozostają bez zmian. Wynik pokazuje osobno: cenę umowną za analizowany miesiąc, kwotę na fakturze oraz abonament od daty naliczania nowej ceny (dla zdarzenia z 2. dnia miesiąca: dni starej ceny = długość miesiąca, dni nowej = 0).
+- Obniżenie lub zakończenie w trakcie miesiąca (reguła CB-2026-11-25): w miesiącu 28-, 29- i 30-dniowym należność to C = (O × d + N × r) ÷ 30, a w miesiącu 31-dniowym B = O + (N − O) × r ÷ 30 (d — dni starej ceny, r — dni nowej ceny). Jedna metoda dotyczy całego koszyka i każdej pozycji. Różnica faktury to F − należność.
+- Przykład zmiany ze 100 zł na 80 zł od 4 lutego 2027 daje **76,67 zł**, a od 4 marca 2027 **81,33 zł**. Wcześniejsze reguły (MIN(A,B), rzeczywiste dni ÷ 30) są historyczne i zostały usunięte z kodu; wskazanie ich jawnie daje wynik „POLICY_UNRESOLVED”.
+- Na poziomie BOK testowe rozbicie pokazuje osobno: należność koszyka, sumę należności pozycji, resztę należności koszyka (należność koszyka − suma należności pozycji) oraz resztę korekty koszyka ((F − należność) − suma różnic pozycji). Reszt nie przypisuje się automatycznie do pozycji. D11 pozostaje otwarte. Przy mieszanym VAT lub kwotach netto można uzyskać poglądowy wynik zbiorczy na podstawie niezależnie potwierdzonych sum brutto. W innych złożonych przypadkach kalkulator kieruje do weryfikacji.
 
 Kwoty liczone są w groszach z użyciem BigInt. Zaokrąglenia są testowe, a reszt groszowych aplikacja nie przypisuje do usług. Wynik wymaga potwierdzenia podstawy umownej i zatwierdzenia księgowego przed użyciem w rozliczeniach.
 
@@ -51,4 +53,4 @@ npm.cmd run test:e2e
 
 E2E startuje własny serwer na wolnym porcie loopback. Można wskazać działającą kopię lokalną przez `BOK_E2E_URL`. Przy powtórzeniu przebiegu można wskazać osobny katalog przez `npm.cmd run test:e2e -- --output=output/playwright/etap3-powtorka`. Projekt używa statycznych modułów ES i kontroli składni Node.js.
 
-[Uzgodnienie A/B i weryfikacja zmian](docs/RAPORT_UZGODNIENIE_AB.md) · [Raport Etapu 3](docs/RAPORT_ETAP_3_AUTO_BILLING_SUD_BOK.md) · [Historia i regresja rzeczywistych dni](docs/RAPORT_REGULA_DNI_I_RESET.md)
+Materiał historyczny (SUPERSEDED, nie opisuje aktywnej reguły): [Historia i regresja rzeczywistych dni](docs/RAPORT_REGULA_DNI_I_RESET.md).

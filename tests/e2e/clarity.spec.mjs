@@ -30,8 +30,7 @@ test('zakończenie wymaga jednej daty, następny dzień jest wyliczany',async({p
 });
 
 test('faktyczna kwota faktury wymaga podania przy włączonej opcji innej kwoty', async ({page}) => {
-  await page.locator('#bok-details > summary').click();
-  await page.locator('#use-lines').check();
+  await page.locator('input[name=calc-mode][value=BOK]').check();
   await page.locator('#month').fill('2027-02');
   await page.locator('#last-old-date').fill('2027-02-03');
   await page.locator('[data-field=old]').fill('100');
@@ -46,8 +45,9 @@ test('faktyczna kwota faktury wymaga podania przy włączonej opcji innej kwoty'
   await expect(page.locator('#result-main-amount')).toBeHidden();
   await invoice.fill('95');
   await page.locator('#calculate').click();
-  await expect(page.locator('#due')).toHaveText('82,00 zł');
-  await expect(page.locator('#delta')).toHaveText('+13,00 zł');
+  // CB-2026-11-25: należność C = 76,67 zł; F = 95,00 zł → różnica F − należność = 18,33 zł.
+  await expect(page.locator('#due')).toHaveText('76,67 zł');
+  await expect(page.locator('#delta')).toHaveText('−18,33 zł');
   await expect(page.locator('#invoiced-source')).toContainText('wpisana, niepotwierdzona');
 });
 
@@ -57,7 +57,7 @@ test('wynik podaje kwotę z faktury i należność po korekcie',async({page})=>{
   await page.locator('#load-example').click();await page.locator('#calculate').click();
   await expect(page.locator('#invoiced-source')).toContainText('Założono kwotę faktury');
   await expect(page.locator('#invoiced-source')).toContainText('100,00 zł');
-  await expect(page.locator('#due')).toHaveText('82,00 zł');
+  await expect(page.locator('#due')).toHaveText('76,67 zł');
   await expect(page.locator('#remainder-row')).toBeHidden();
 });
 
@@ -65,7 +65,7 @@ test('wynik podaje dodatnią różnicę z opisem zmniejszenia',async({page})=>{
   await page.locator('#training-mode').check();
   await page.locator('#example-select').selectOption('FEB_CHANGE');
   await page.locator('#load-example').click();await page.locator('#calculate').click();
-  await expect(page.locator('#result-main-amount')).toHaveText('+18,00 zł — zmniejszenie');
+  await expect(page.locator('#result-main-amount')).toHaveText('−23,33 zł — zmniejszenie faktury');
 });
 
 test('zmiana usługi lub miesiąca unieważnia wynik i zachowuje wpisane dane', async ({page}) => {
@@ -76,7 +76,7 @@ test('zmiana usługi lub miesiąca unieważnia wynik i zachowuje wpisane dane', 
   await row.locator('[data-field=invoiced]').fill('110');
   await page.locator('#calculate').click();
   await expect(page.locator('#line-results')).toBeVisible();
-  await row.locator('[data-field=service]').selectOption({label: 'Internet+'});
+  await row.locator('[data-field=service]').selectOption({label: 'Internet Plus / stały IP'});
   await expect(page.locator('#results')).toBeHidden();
   await page.locator('#month').fill('2027-04');
   await expect(row.locator('[data-field=invoiced]')).toHaveValue('110');

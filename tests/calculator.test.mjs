@@ -1,19 +1,28 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { calculate } from '../src/calculator.mjs';
+import { calculate, CB_RULE } from '../src/calculator.mjs';
 
 const fixtures = JSON.parse(readFileSync(new URL('./fixtures/reference.json', import.meta.url), 'utf8'));
 for (const fixture of fixtures) {
-  test(`${fixture.id}: należność, różnica, polityka i kontrolne A/B z Notion`, () => {
+  test(`${fixture.id}: należność, różnica i metoda wg CB-2026-11-25 (wartości referencyjne wpisane ręcznie)`, () => {
     const result = calculate(fixture.input);
     assert.equal(result.due, fixture.expected.due);
     assert.equal(result.delta, fixture.expected.delta);
     assert.equal(result.method, fixture.expected.method);
+    assert.equal(result.rule, 'CB-2026-11-25');
     if (fixture.expected.a) assert.equal(result.a, fixture.expected.a);
     if (fixture.expected.b) assert.equal(result.b, fixture.expected.b);
+    if (fixture.expected.c) assert.equal(result.c, fixture.expected.c);
   });
 }
+test('calculate() ma jedną regułę CB; metody A i A=B nie występują', () => {
+  for (const fixture of fixtures) {
+    const result = calculate(fixture.input);
+    assert.equal(result.rule, CB_RULE);
+    assert.ok(['B', 'C', 'Pełna O', 'Pełna N'].includes(result.method), fixture.id);
+  }
+});
 
 const base = { month: '2026-11', effectiveDate: '2026-11-18', type: 'DOWNGRADE', old: '150', new: '100', invoiced: '150', basis: 'gross', dateVerified: true };
 test('T26: globalny koszyk daje 140,67; alokacja D11 pozostaje poza wynikiem', () => {

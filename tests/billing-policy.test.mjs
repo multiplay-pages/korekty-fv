@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  evaluateCorrection as resolve, summarizeGrossRows, LEGACY_MIN_AB_TEST_POLICY, ACTUAL_DAYS_TEST_POLICY,
-} from '../src/billing-policy.mjs';
+import { evaluateCorrection as resolve, summarizeGrossRows } from '../src/billing-policy.mjs';
 
-const evaluateCorrection = (input, policy = LEGACY_MIN_AB_TEST_POLICY) => resolve(input, policy);
+// Testy silnika (warstwa pod formularzem) z regułą CB; profil formularza testują cb-2026-11-25 i stage-5a.
+const ENGINE_CB = Object.freeze({ version: 'engine-cb-test', partialRule: 'CB' });
+const evaluateCorrection = (input, policy = ENGINE_CB) => resolve(input, policy);
 
 const base = {
   source: 'aggregate', type: 'DOWNGRADE', month: '2026-11',
@@ -19,11 +19,11 @@ const details = (rows, changes = {}) => ({ ...base, source: 'lines', totals: {},
 const cases = [
   ['AUTO-01', { effectiveDate: '2026-11-01' }, {}, '120.00', '30.00', 'R03', 30, 0],
   ['AUTO-02', {}, {}, '135.00', '15.00', 'R07', 30, 15],
-  ['AUTO-03', { month: '2027-02', effectiveDate: '2027-02-04' }, { old: '100', new: '80', invoiced: '100' }, '82.00', '18.00', 'R07', 28, 3],
-  ['AUTO-04', { month: '2028-02', effectiveDate: '2028-02-04' }, { old: '100', new: '80', invoiced: '100' }, '82.00', '18.00', 'R07', 29, 3],
+  ['AUTO-03', { month: '2027-02', effectiveDate: '2027-02-04' }, { old: '100', new: '80', invoiced: '100' }, '76.67', '23.33', 'R07', 28, 3], // C: (100×3 + 80×25)/30
+  ['AUTO-04', { month: '2028-02', effectiveDate: '2028-02-04' }, { old: '100', new: '80', invoiced: '100' }, '79.33', '20.67', 'R07', 29, 3], // C: (100×3 + 80×26)/30
   ['AUTO-05', { month: '2027-03', effectiveDate: '2027-03-04' }, { old: '100', new: '80', invoiced: '100' }, '81.33', '18.67', 'R07', 31, 3],
   ['AUTO-06', { type: 'PODWYŻKA', effectiveDate: '2026-11-01' }, { old: '100', new: '130', invoiced: '100' }, '130.00', '-30.00', 'R03', 30, 0],
-  ['AUTO-07', { type: 'PODWYŻKA', effectiveDate: '2026-11-02' }, { old: '100', new: '130', invoiced: '100' }, '100.00', '0.00', 'R06', 30, 1],
+  ['AUTO-07', { type: 'PODWYŻKA', effectiveDate: '2026-11-02' }, { old: '100', new: '130', invoiced: '100' }, '100.00', '0.00', 'R06', 30, 30], // FIX-03: podwyżka od 02.11 → cały listopad po starej cenie (dni 30/0), nowa cena od 01.12.2026
   ['AUTO-08', { type: 'WYPOWIEDZENIE', effectiveDate: '', lastOldDate: '2026-11-17' }, { new: '' }, '85.00', '65.00', 'R08', 30, 17],
   ['AUTO-09', { type: 'WYPOWIEDZENIE', month: '2027-03', effectiveDate: '', lastOldDate: '2027-03-01' }, { new: '0' }, '0.00', '150.00', 'R08', 31, 1],
   ['AUTO-10', { type: 'NO_CHANGE', month: '2027-02', effectiveDate: '2027-02-04' }, { new: '150' }, '150.00', '0.00', 'R05', 28, 3],
@@ -33,7 +33,7 @@ for (const [id, change, amounts, due, delta, rule, length, oldDays] of cases) {
   test(id, () => {
     const result = evaluateCorrection(withCase(change, amounts));
     assert.equal(result.status, 'TEST_ONLY');
-    assert.equal(result.policyVersion, LEGACY_MIN_AB_TEST_POLICY.version);
+    assert.equal(result.policyVersion, ENGINE_CB.version);
     assert.equal(result.accountingAllowed, false);
     assert.deepEqual([result.amountDue, result.invoiceDifference, result.ruleId], [due, delta, rule]);
     assert.deepEqual([result.daysInMonth, result.daysOld, result.daysNew], [length, oldDays, length - oldDays]);
@@ -54,24 +54,11 @@ test('AUTO-12 rozstrzyga B dokładnie na koszyku i stosuje ją do obu usług', (
   assert.equal(result.rows[1].documentChange, '9.33');
 });
 
-for (const [month, date, days, actual] of [
-  ['2027-02', '2027-02-04', 28, '76.67'],
-  ['2028-02', '2028-02-04', 29, '79.33'],
-  ['2027-03', '2027-03-04', 31, '84.67'],
-]) {
-  test(`profil deweloperski rzeczywistych dni, miesiąc ${days}-dniowy`, () => {
-    const input = details([line('100', '80')], { month, effectiveDate: date });
-    assert.equal(evaluateCorrection(input, ACTUAL_DAYS_TEST_POLICY).amountDue, actual);
-    assert.notEqual(evaluateCorrection(input).amountDue, actual);
-    assert.equal(evaluateCorrection({...input, source: 'aggregate', totals: { old: '100', new: '80', invoiced: '100' }}, ACTUAL_DAYS_TEST_POLICY).code, 'LINES_NEEDED');
-  });
-}
-test('profil /30 zachowuje 5 zł za dzień, a MIN(A,B) dopuszcza zero', () => {
+test('zakończenie po jednym dniu marca daje 0,00 zł (metoda B)', () => {
   const input = details([line('150', '0')], {
     type: 'WYPOWIEDZENIE', month: '2027-03', effectiveDate: '', lastOldDate: '2027-03-01',
   });
-  assert.equal(evaluateCorrection(input, ACTUAL_DAYS_TEST_POLICY).amountDue, '5.00');
-  assert.equal(evaluateCorrection(input).amountDue, '0.00');
+  assert.deepEqual([evaluateCorrection(input).global.method, evaluateCorrection(input).amountDue], ['B', '0.00']);
 });
 
 test('granice działają także przy braku częściowej reguły', () => {
@@ -148,7 +135,7 @@ test('duplikaty mają niezależne identyfikatory, grosze oraz ta sama kwota dla 
   assert.deepEqual(detail.totals, summarizeGrossRows(rows));
   assert.deepEqual([detail.amountDue, detail.invoiceDifference], [aggregate.amountDue, aggregate.invoiceDifference]);
   assert.deepEqual(detail.rows.map(({ id, label }) => [id, label]), [['a','Internet'],['b','Internet']]);
-  assert.equal(detail.global.method, 'A=B');
+  assert.equal(detail.global.method, 'C');
   assert.equal(detail.residual, '-0.01');
   assert.ok(detail.warnings.includes('UNALLOCATED_ROUNDING'));
 });
@@ -169,7 +156,9 @@ test('kolejny miesiąc z obniżką od drugiego dnia nie ma jednej pełnej ceny',
 
 test('brak konfiguracji nie wybiera ukrytej reguły częściowej', () => {
   assert.equal(evaluateCorrection(base, null).code, 'POLICY_UNRESOLVED');
-  assert.equal(evaluateCorrection(base, { partialRule: 'MIN_AB' }).code, 'POLICY_UNRESOLVED');
+  for (const partialRule of ['MIN_AB', 'ACTUAL_DAYS']) {
+    assert.equal(evaluateCorrection(base, { version: 'stara-regula', partialRule }).code, 'POLICY_UNRESOLVED', partialRule);
+  }
 });
 
 test('kwoty netto na poziomie zbiorczym wymagają weryfikacji', () => {

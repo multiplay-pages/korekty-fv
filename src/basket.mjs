@@ -1,44 +1,25 @@
 import { calculate } from './calculator.mjs';
 
-// Etykiety miesięcznych pozycji z katalogów GigaNet, GigaBox i Biznes 3.1.
-export const SERVICE_GROUPS = {
-  'Internet i sieć': {
-    internet: 'Internet',
-    internetPlus: 'Internet+',
-    symmetric: 'Łącze symetryczne',
-    staticIp: 'Stały adres IP',
-    wifiMesh: 'WiFi Premium (MESH)',
-    lineMaintenance: 'Utrzymanie linii',
-  },
-  'Telewizja i dodatki': {
-    tv: 'Telewizja',
-    multiroom: 'Multiroom',
-    tvMax: 'TV MAX',
-    cplusSport: 'C+ Super Sport',
-    cplusFilms: 'C+ Seriale i Filmy',
-    pvrM: 'PVR M',
-    pvrL: 'PVR L',
-  },
-  'Telefon stacjonarny': {
-    phone60: 'Telefon 60 minut',
-    phone300: 'Telefon 300 minut',
-    phoneNoLimit: 'Telefon No-Limit / NoLimit Max',
-  },
-  'Bezpieczeństwo': {
-    securityPc1: 'Bitdefender Internet Security 1',
-    securityPc3: 'Bitdefender Internet Security 3',
-    securityMobile: 'Bitdefender Mobile Security',
-    securityFamily: 'Bitdefender Family Pack',
-    securityMac1: 'Bitdefender Antivirus for Mac 1',
-    securityMac3: 'Bitdefender Antivirus for Mac 3',
-  },
-  'Sprzęt i pozostałe': {
-    rental: 'Dzierżawa urządzeń',
-    routerRental: 'Dzierżawa routera',
-    other: 'Inny abonament',
-  },
-};
-export const SERVICES = Object.freeze(Object.assign({}, ...Object.values(SERVICE_GROUPS)));
+// Słownik usług BOK z domyślną stawką VAT (decyzja właściciela 26.11.2026). Stawka to podpowiedź do pola VAT wiersza;
+// konsultant poprawia ją zgodnie z pozycją w MMS. `draft` = stawka robocza, niezatwierdzona klasyfikacja podatkowa.
+export const SERVICE_CATALOG = Object.freeze({
+  internet: { label: 'Internet', vat: '23' },
+  tv: { label: 'Telewizja', vat: '8' },
+  phone: { label: 'Telefon', vat: '23' },
+  multiroom: { label: 'Multiroom', vat: '8', draft: true },
+  canalPlus: { label: 'CANAL+ — pakiety kanałów', vat: '8' },
+  tvPackage: { label: 'Dodatkowy pakiet TV', vat: '8' },
+  pvr: { label: 'Jeszcze Raz / PVR', vat: '8', draft: true },
+  wifiMesh: { label: 'Wi-Fi Premium / MESH', vat: '23' },
+  internetPlus: { label: 'Internet Plus / stały IP', vat: '23' },
+  symmetric: { label: 'Internet symetryczny', vat: '23' },
+  security: { label: 'Bezpieczny Internet', vat: '23' },
+  lineMaintenance: { label: 'Utrzymanie linii', vat: '23' },
+  rental: { label: 'Dzierżawa urządzenia', vat: '23', draft: true },
+  vod: { label: 'VOD — odrębna usługa', vat: '23', draft: true },
+  other: { label: 'Inna usługa', vat: '23', draft: true },
+});
+export const SERVICES = Object.freeze(Object.fromEntries(Object.entries(SERVICE_CATALOG).map(([key, { label }]) => [key, label])));
 const FORM_FIELDS = new Set(['month','effectiveDate','lastOldDate','type','dateVerified','paid','multipleDates','unresolvedDiscounts','rows']);
 const ROW_FIELDS = new Set(['label','description','service','old','new','invoiced','basis','vat']);
 function fail(code, message, field) { throw Object.assign(new Error(message), { code, field }); }
@@ -96,7 +77,8 @@ export function evaluateBasket(form) {
       case 'Pełna O': numerator=o*30n; break;
       case 'Pełna N': numerator=n*30n; break;
       case 'B': numerator=o*30n+(n-o)*BigInt(global.daysNew); break;
-      default: numerator=n*30n+(o-n)*BigInt(global.daysOld); // A lub A=B
+      // C (CB-2026-11-25): ta sama metoda globalna dla każdego wiersza, także bez zmiany ceny (wtedy O·L/30).
+      default: numerator=o*BigInt(global.daysOld)+n*BigInt(global.daysNew); // C
     }
     const due=round30(numerator),delta=f-due;
     rowSum+=due; rowDeltaSum+=delta;

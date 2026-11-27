@@ -54,6 +54,12 @@ function nextDayKey(date) {
  * Zwraca tekst PLN, grosze i dokładne liczniki /30 (w groszach), bez BigInt w JSON.
  * dateVerified jest deklaracją wywołującego; funkcja nie weryfikuje dokumentów.
  */
+export const CB_RULE = 'CB-2026-11-25';
+
+/**
+ * Jedyna reguła: CB-2026-11-25 — dla miesiąca 28/29/30-dniowego C=(O×d+N×r)/30, dla 31-dniowego B=O+(N−O)×r/30.
+ * Wartości a i b zwracane są wyłącznie informacyjnie (przypadki referencyjne).
+ */
 export function calculate(input) {
   if (!input || typeof input !== 'object' || Array.isArray(input)) reject('INVALID_INPUT', 'Wymagany obiekt danych.');
   for (const key of Object.keys(input)) if (!FIELDS.has(key)) reject('UNSUPPORTED_FIELD', `Nieobsługiwane pole: ${key}`);
@@ -77,11 +83,13 @@ export function calculate(input) {
   const r = length - d;
   const a = n * 30n + (o - n) * BigInt(d);
   const b = o * 30n + (n - o) * BigInt(r);
+  const c = o * BigInt(d) + n * BigInt(r); // C = (O×d + N×r)/30, w groszach ×30
   let method, dueExact;
   if (n === o) { method = 'Pełna O'; dueExact = o * 30n; }
   else if (t.key <= period.key) { method = 'Pełna N'; dueExact = n * 30n; }
   else if (t.key > end || input.type === 'PODWYŻKA') { method = 'Pełna O'; dueExact = o * 30n; }
-  else { method = a === b ? 'A=B' : a < b ? 'A' : 'B'; dueExact = a < b ? a : b; }
+  else if (length === 31) { method = 'B'; dueExact = b; }
+  else { method = 'C'; dueExact = c; }
   const due = round30(dueExact), delta = f - due;
   const warnings = ['D05_CONTRACT_GATE_OPEN', 'D11_ACCOUNTING_GATE_OPEN'];
   if (f !== o) warnings.push('INVOICE_DIFFERS_FROM_OLD');
@@ -90,12 +98,12 @@ export function calculate(input) {
   if (length === 31 && d === 1 && n === 0n && due === 0n) warnings.push('ZERO_FOR_ONE_SERVICE_DAY');
   const rational = numerator => ({ numerator: String(numerator), denominator: '30' });
   return {
-    status: 'TEST_ONLY', algorithmVersion: '0.1.0-stage1', basis: 'gross',
+    status: 'TEST_ONLY', rule: CB_RULE, algorithmVersion: '0.2.0-cb-2026-11-25', basis: 'gross',
     roundingPolicy: 'HALF_UP_TEST_ONLY_D11_OPEN', lineAllocationStatus: 'NOT_IMPLEMENTED_D11',
     classification: n === o ? 'NO_CHANGE' : input.type,
     method, daysInMonth: length, daysOld: d, daysNew: r,
-    a: format(round30(a)), b: format(round30(b)), due: format(due), delta: format(delta),
+    a: format(round30(a)), b: format(round30(b)), c: format(round30(c)), due: format(due), delta: format(delta),
     dueCents: String(due), deltaCents: String(delta),
-    exact: { a: rational(a), b: rational(b), due: rational(dueExact) }, warnings,
+    exact: { a: rational(a), b: rational(b), c: rational(c), due: rational(dueExact) }, warnings,
   };
 }
